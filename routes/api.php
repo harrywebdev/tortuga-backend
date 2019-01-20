@@ -34,3 +34,7 @@ Route::middleware('cors')->get('/products', function (Request $request) {
 
     return response()->json($transformer->output($products));
 });
+
+Route::fallback(function () {
+    return response()->json(['errors' => ['Not Found.']], 404);
+})->name('api.fallback.404')->middleware('cors');
