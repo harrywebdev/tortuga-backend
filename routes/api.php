@@ -16,3 +16,17 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/categories', function (Request $request) {
+    /** @var \Illuminate\Database\Eloquent\Collection $products */
+    $products = \App\Category::has('products')->ordered()->get();
+
+    return response()->json($products->toArray());
+});
+
+Route::get('/products', function (Request $request) {
+    /** @var \Illuminate\Database\Eloquent\Collection $products */
+    $products = \App\Product::with('variations')->ordered()->get();
+
+    return response()->json($products->toArray());
+});
