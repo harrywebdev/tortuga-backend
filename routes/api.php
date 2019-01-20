@@ -1,6 +1,10 @@
 <?php
 
+use App\Category;
+use App\Product;
 use Illuminate\Http\Request;
+use Tortuga\ApiTransformer\CategoriesApiTransformer;
+use Tortuga\ApiTransformer\ProductsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,16 +21,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/categories', function (Request $request) {
-    /** @var \Illuminate\Database\Eloquent\Collection $products */
-    $products = \App\Category::has('products')->ordered()->get();
+Route::middleware('cors')->get('/categories', function (Request $request) {
+    $categories  = Category::has('products')->ordered()->get()->toArray();
+    $transformer = new CategoriesApiTransformer();
 
-    return response()->json($products->toArray());
+    return response()->json($transformer->output($categories, 'categories'));
 });
 
-Route::get('/products', function (Request $request) {
-    /** @var \Illuminate\Database\Eloquent\Collection $products */
-    $products = \App\Product::with('variations')->ordered()->get();
+Route::middleware('cors')->get('/products', function (Request $request) {
+    $products    = Product::with('variations')->ordered()->get()->toArray();
+    $transformer = new ProductsApiTransformer();
 
-    return response()->json($products->toArray());
+    return response()->json($transformer->output($products));
 });
