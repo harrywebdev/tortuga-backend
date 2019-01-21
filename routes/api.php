@@ -1,6 +1,10 @@
 <?php
 
+use App\Category;
+use App\Product;
 use Illuminate\Http\Request;
+use Tortuga\ApiTransformer\CategoriesApiTransformer;
+use Tortuga\ApiTransformer\ProductsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +20,21 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('cors')->get('/categories', function (Request $request) {
+    $categories  = Category::has('products')->ordered()->get()->toArray();
+    $transformer = new CategoriesApiTransformer();
+
+    return response()->json($transformer->output($categories, 'categories'));
+});
+
+Route::middleware('cors')->get('/products', function (Request $request) {
+    $products    = Product::with('variations')->ordered()->get()->toArray();
+    $transformer = new ProductsApiTransformer();
+
+    return response()->json($transformer->output($products));
+});
+
+Route::fallback(function () {
+    return response()->json(['errors' => ['Not Found.']], 404);
+})->name('api.fallback.404')->middleware('cors');
