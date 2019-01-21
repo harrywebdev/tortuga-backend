@@ -37,7 +37,8 @@ class ProductsApiTransformer implements ApiTransformer
                 // format price
                 // TODO: refactor into proper Locale based on request headers
                 setlocale(LC_MONETARY, 'cs_CZ');
-                $variation['price'] = money_format('%.0n', $variation['price'] / 100);
+                $variation['formatted_price']    = money_format('%.0n', $variation['price'] / 100);
+                $variation['formatted_currency'] = localeconv()['currency_symbol'];
                 unset($variation['currency']);
 
                 $variationItem['attributes'] = $this->dasherizeKeys($variation);

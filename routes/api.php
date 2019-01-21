@@ -25,7 +25,7 @@ Route::middleware('cors')->get('/categories', function (Request $request) {
     $categories  = Category::has('products')->ordered()->get()->toArray();
     $transformer = new CategoriesApiTransformer();
 
-    return response()->json($transformer->output($categories, 'categories'));
+    return response()->json($transformer->output($categories));
 });
 
 Route::middleware('cors')->get('/products', function (Request $request) {
