@@ -3,8 +3,12 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
+use Tortuga\Api\InvalidAttributeException;
+use Tortuga\Api\InvalidResourceException;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
+use Tortuga\ApiTransformer\GetCustomerApiTransformer;
 use Tortuga\ApiTransformer\GetProductsApiTransformer;
+use Tortuga\Customer\CustomerRegistrationStrategy;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +37,46 @@ Route::middleware('cors')->get('/products', function (Request $request) {
     $transformer = new GetProductsApiTransformer();
 
     return response()->json($transformer->output($products));
+});
+
+Route::middleware('cors')->post('/customer', function (Request $request) {
+    $strategy = new CustomerRegistrationStrategy();
+
+    try {
+        $resourceType = $request->input('data.type');
+        if (!$resourceType || $resourceType !== 'customer') {
+            throw new InvalidResourceException($resourceType);
+        }
+
+        $customer    = $strategy->registerCustomer(
+            $request->input('data.attributes.reg_type', ''),
+            $request->input('data.attributes', [])
+        );
+        $transformer = new GetCustomerApiTransformer();
+
+        return response()->json($transformer->output($customer->toArray()));
+    } catch (InvalidResourceException $e) {
+        return response()->json((object)['errors' => [(object)[
+            'status' => 422,
+            'source' => (object)['pointer' => '/data/type'],
+            'title'  => $e->getMessage(),
+            'detail' => sprintf('Invalid resource type "%s" supplied instead of "%s"', $e->getResourceType(),
+                'customer'),
+        ],]], 400);
+    } catch (InvalidAttributeException $e) {
+        return response()->json((object)['errors' => [(object)[
+            'status' => 422,
+            'source' => (object)['pointer' => '/data/attributes/' . $e->getAttribute()],
+            'title'  => $e->getMessage(),
+            'detail' => $e->getDetail(),
+        ],]], 400);
+    } catch (\Exception $e) {
+        dd($e);
+        return response()->json((object)['errors' => [(object)[
+            'status' => 500,
+            'title'  => 'Internal Server Error',
+        ],]], 500);
+    }
 });
 
 Route::fallback(function () {

@@ -16,7 +16,7 @@ class CreateCustomersTable extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->enum('reg_type', ['email', 'phone', 'facebook']);
+            $table->enum('reg_type', ['email', 'mobile', 'facebook']);
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('mobile')->nullable();
