@@ -3,8 +3,8 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\CategoriesApiTransformer;
-use Tortuga\ApiTransformer\ProductsApiTransformer;
+use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
+use Tortuga\ApiTransformer\GetProductsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,14 +23,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('cors')->get('/categories', function (Request $request) {
     $categories  = Category::has('products')->ordered()->get()->toArray();
-    $transformer = new CategoriesApiTransformer();
+    $transformer = new GetCategoriesApiTransformer();
 
     return response()->json($transformer->output($categories));
 });
 
 Route::middleware('cors')->get('/products', function (Request $request) {
     $products    = Product::with('variations')->ordered()->get()->toArray();
-    $transformer = new ProductsApiTransformer();
+    $transformer = new GetProductsApiTransformer();
 
     return response()->json($transformer->output($products));
 });

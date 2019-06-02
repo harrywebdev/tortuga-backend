@@ -2,7 +2,7 @@
 
 namespace Tortuga\ApiTransformer;
 
-class ProductsApiTransformer implements ApiTransformer
+class GetProductsApiTransformer implements ApiTransformer
 {
     /**
      * @param array $data
