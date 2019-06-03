@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b220dba5b55a4226fe5edadecefbb7f",
+    "content-hash": "ec697fe1ddd51e60474d060ee1ce86d5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3120,6 +3120,63 @@
                 "dump"
             ],
             "time": "2019-01-03T09:07:35+00:00"
+        },
+        {
+            "name": "tayokin/laravel-facebook-accountkit",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tayokin/laravel-facebook-accountkit.git",
+                "reference": "7e7a6dc6c0b1a2c8463e3c8e72e858f0f00925f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tayokin/laravel-facebook-accountkit/zipball/7e7a6dc6c0b1a2c8463e3c8e72e858f0f00925f2",
+                "reference": "7e7a6dc6c0b1a2c8463e3c8e72e858f0f00925f2",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "illuminate/support": ">=5.1",
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=5.4.3",
+                "squizlabs/php_codesniffer": "^2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Tayokin\\FacebookAccountKit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tayokin Max",
+                    "email": "tayokin.max@gmail.com",
+                    "homepage": "https://github.com/tayokin/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Facebook Account Kit SDK (PHP)",
+            "homepage": "https://github.com/tayokin/laravel-facebook-accountkit",
+            "keywords": [
+                "account kit",
+                "accountkit",
+                "facebook",
+                "laravel",
+                "php"
+            ],
+            "time": "2018-04-08T11:49:40+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",

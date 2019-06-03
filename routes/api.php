@@ -3,6 +3,7 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
+use Tortuga\Api\AccountKitException;
 use Tortuga\Api\InvalidAttributeException;
 use Tortuga\Api\InvalidResourceException;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
@@ -25,26 +26,26 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('cors')->get('/categories', function (Request $request) {
+Route::get('/categories', function (Request $request) {
     $categories  = Category::has('products')->ordered()->get()->toArray();
     $transformer = new GetCategoriesApiTransformer();
 
     return response()->json($transformer->output($categories));
 });
 
-Route::middleware('cors')->get('/products', function (Request $request) {
+Route::get('/products', function (Request $request) {
     $products    = Product::with('variations')->ordered()->get()->toArray();
     $transformer = new GetProductsApiTransformer();
 
     return response()->json($transformer->output($products));
 });
 
-Route::middleware('cors')->post('/customer', function (Request $request) {
+Route::post('/customers', function (Request $request) {
     $strategy = new CustomerRegistrationStrategy();
 
     try {
-        $resourceType = $request->input('data.type');
-        if (!$resourceType || $resourceType !== 'customer') {
+        $resourceType = $request->input('data.type', '');
+        if (!$resourceType || $resourceType !== 'customers') {
             throw new InvalidResourceException($resourceType);
         }
 
@@ -53,7 +54,7 @@ Route::middleware('cors')->post('/customer', function (Request $request) {
             $request->input('data.attributes', [])
         );
         $transformer = new GetCustomerApiTransformer();
-
+        
         return response()->json($transformer->output($customer->toArray()));
     } catch (InvalidResourceException $e) {
         return response()->json((object)['errors' => [(object)[
@@ -61,7 +62,7 @@ Route::middleware('cors')->post('/customer', function (Request $request) {
             'source' => (object)['pointer' => '/data/type'],
             'title'  => $e->getMessage(),
             'detail' => sprintf('Invalid resource type "%s" supplied instead of "%s"', $e->getResourceType(),
-                'customer'),
+                'customers'),
         ],]], 400);
     } catch (InvalidAttributeException $e) {
         return response()->json((object)['errors' => [(object)[
@@ -69,6 +70,13 @@ Route::middleware('cors')->post('/customer', function (Request $request) {
             'source' => (object)['pointer' => '/data/attributes/' . $e->getAttribute()],
             'title'  => $e->getMessage(),
             'detail' => $e->getDetail(),
+        ],]], 400);
+    } catch (AccountKitException $e) {
+        return response()->json((object)['errors' => [(object)[
+            'status' => 401,
+            'source' => (object)['pointer' => '/data/attributes/code'],
+            'title'  => $e->getMessage(),
+            'detail' => $e->getMessage(),
         ],]], 400);
     } catch (\Exception $e) {
         dd($e);
@@ -81,4 +89,4 @@ Route::middleware('cors')->post('/customer', function (Request $request) {
 
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);
-})->name('api.fallback.404')->middleware('cors');
+})->name('api.fallback.404');

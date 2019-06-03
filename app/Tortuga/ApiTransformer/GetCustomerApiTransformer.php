@@ -2,6 +2,8 @@
 
 namespace Tortuga\ApiTransformer;
 
+use Illuminate\Support\Arr;
+
 class GetCustomerApiTransformer implements ApiTransformer
 {
     /**
@@ -14,30 +16,13 @@ class GetCustomerApiTransformer implements ApiTransformer
             'data'  => [
                 'id'         => $data['id'],
                 'type'       => 'customer',
-                'attributes' => $this->dasherizeKeys($data),
+                'attributes' => Arr::except($data, 'id'),
             ],
             'links' => [
-                'self' => env('APP_URL') . '/api/customer/' . $data['id'],
+                'self' => env('APP_URL') . '/api/customers/' . $data['id'],
             ],
         ];
 
         return $output;
-    }
-
-    /**
-     * Swap underscore for dash in attribute keys
-     * @param array $attributes
-     * @return array
-     */
-    private function dasherizeKeys(array $attributes): array
-    {
-        foreach ($attributes as $key => $attribute) {
-            if (strpos($key, '_')) {
-                $attributes[str_replace('_', '-', $key)] = $attribute;
-                unset($attributes[$key]);
-            }
-        }
-
-        return $attributes;
     }
 }

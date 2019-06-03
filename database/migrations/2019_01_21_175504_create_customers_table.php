@@ -19,14 +19,17 @@ class CreateCustomersTable extends Migration
             $table->enum('reg_type', ['email', 'mobile', 'facebook']);
             $table->string('name');
             $table->string('email')->nullable();
-            $table->string('mobile')->nullable();
+            $table->string('mobile_number')->nullable();
+            $table->string('mobile_country_prefix')->nullable();
+            $table->string('mobile_national_number')->nullable();
+            $table->string('account_kit_id')->nullable();
             $table->string('facebook_id')->nullable();
             $table->json('meta')->nullable();
 
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(['email', 'mobile']);
+            $table->unique(['email', 'mobile_number']);
         });
     }
 

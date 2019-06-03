@@ -2,6 +2,8 @@
 
 namespace Tortuga\ApiTransformer;
 
+use Illuminate\Support\Arr;
+
 class GetProductsApiTransformer implements ApiTransformer
 {
     /**
@@ -17,13 +19,10 @@ class GetProductsApiTransformer implements ApiTransformer
                 'type' => 'products',
             ];
 
-            $variations = $item['variations'];
-            unset($item['id'], $item['variations']);
-
-            $outputItem['attributes']    = $this->dasherizeKeys($item);
+            $outputItem['attributes']    = Arr::except($item, ['id', 'variations']);
             $outputItem['relationships'] = ['variations' => ['data' => []]];
 
-            foreach ($variations as $variation) {
+            foreach ($item['variations'] as $variation) {
                 $variationItem = [
                     'id'   => $variation['id'],
                     'type' => 'variations',
@@ -41,7 +40,7 @@ class GetProductsApiTransformer implements ApiTransformer
                 $variation['formatted_currency'] = localeconv()['currency_symbol'];
                 unset($variation['currency']);
 
-                $variationItem['attributes'] = $this->dasherizeKeys($variation);
+                $variationItem['attributes'] = $variation;
                 $output['included'][]        = $variationItem;
             }
 
@@ -53,22 +52,5 @@ class GetProductsApiTransformer implements ApiTransformer
         ];
 
         return $output;
-    }
-
-    /**
-     * Swap underscore for dash in attribute keys
-     * @param array $attributes
-     * @return array
-     */
-    private function dasherizeKeys(array $attributes): array
-    {
-        foreach ($attributes as $key => $attribute) {
-            if (strpos($key, '_')) {
-                $attributes[str_replace('_', '-', $key)] = $attribute;
-                unset($attributes[$key]);
-            }
-        }
-
-        return $attributes;
     }
 }

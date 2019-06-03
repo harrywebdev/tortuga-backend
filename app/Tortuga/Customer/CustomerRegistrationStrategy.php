@@ -3,12 +3,14 @@
 namespace Tortuga\Customer;
 
 use App\Customer;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Tortuga\Api\AccountKitException;
 use Tortuga\Api\InvalidAttributeException;
-use Tortuga\ValidationRules\Customer\EmailCustomerValidationRules;
-use Tortuga\ValidationRules\Customer\MobileCustomerValidationRules;
+use Tortuga\ValidationRules\AccountKitCustomerValidationRules;
 use Tortuga\ValidationRules\ValidationRules;
+use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
 
 class CustomerRegistrationStrategy
 {
@@ -19,11 +21,9 @@ class CustomerRegistrationStrategy
                 return $this->_registerCustomerViaEmail($customerData);
             case 'mobile':
                 return $this->_registerCustomerViaMobile($customerData);
-            case 'facebook':
-                return $this->_registerCustomerViaFacebook($customerData);
             default:
                 throw new InvalidAttributeException('reg_type',
-                    'Registration Type must be one of following: "email", "mobile", "facebook"', !$registrationType);
+                    'Registration Type must be one of following: "email", "mobile"', !$registrationType);
         }
     }
 
@@ -35,7 +35,7 @@ class CustomerRegistrationStrategy
      */
     private function _registerCustomerViaEmail(array $customerData): Customer
     {
-        $customerData = $this->_validateCustomerData($customerData, (new EmailCustomerValidationRules()));
+        $customerData = $this->_validateCustomerData($customerData, (new AccountKitCustomerValidationRules()));
 
         throw new \Exception('Registration via email is not supported at the moment');
     }
@@ -46,19 +46,29 @@ class CustomerRegistrationStrategy
      */
     private function _registerCustomerViaMobile(array $customerData): Customer
     {
-        $customerData = $this->_validateCustomerData($customerData, (new MobileCustomerValidationRules()));
+        $customerData = $this->_validateCustomerData($customerData, (new AccountKitCustomerValidationRules()));
 
-        $customer = new Customer($customerData);
-        $customer->save();
+        try {
+            $accountData = FacebookAccountKitFacade::getAccountDataByCode($customerData['code']);
 
-        return $customer;
-    }
+            $customer                         = new Customer();
+            $customer->name                   = $customerData['name'];
+            $customer->mobile_number          = $accountData->phone->number;
+            $customer->mobile_country_prefix  = $accountData->phone->country_prefix;
+            $customer->mobile_national_number = $accountData->phone->national_number;
+            $customer->account_kit_id         = $accountData->id;
 
-    private function _registerCustomerViaFacebook(array $customerData): Customer
-    {
-        $customer = new Customer($customerData);
+            $customer->save();
 
-        return $customer;
+            return $customer;
+        } catch (ClientException $e) {
+            $responseContents = json_decode($e->getResponse()->getBody()->getContents());
+            if (isset($responseContents->error) && isset($responseContents->error->message)) {
+                throw new AccountKitException($responseContents->error->message);
+            }
+
+            throw new \Exception($e->getMessage());
+        }
     }
 
     /**
