@@ -54,7 +54,7 @@ Route::post('/customers', function (Request $request) {
             $request->input('data.attributes', [])
         );
         $transformer = new GetCustomerApiTransformer();
-        
+
         return response()->json($transformer->output($customer->toArray()));
     } catch (InvalidResourceException $e) {
         return response()->json((object)['errors' => [(object)[
@@ -79,10 +79,10 @@ Route::post('/customers', function (Request $request) {
             'detail' => $e->getMessage(),
         ],]], 400);
     } catch (\Exception $e) {
-        dd($e);
         return response()->json((object)['errors' => [(object)[
             'status' => 500,
             'title'  => 'Internal Server Error',
+            'detail' => $e->getMessage(),
         ],]], 500);
     }
 });

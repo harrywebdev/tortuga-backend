@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Tayokin\FacebookAccountKit\FacebookAccountKitServiceProvider::class,
+        SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,
     ],
 
     /*
@@ -226,6 +227,7 @@ return [
         'View'         => Illuminate\Support\Facades\View::class,
 
         'AccountKit' => Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade::class,
+        'Facebook'   => SammyK\LaravelFacebookSdk\FacebookFacade::class,
 
     ],
 
