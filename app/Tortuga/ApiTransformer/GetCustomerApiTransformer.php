@@ -10,17 +10,16 @@ class GetCustomerApiTransformer implements ApiTransformer
      */
     public function output(array $data): array
     {
-        $output = ['data' => [], 'included' => []];
-        foreach ($data as $item) {
-            $outputItem = [
-                'id'   => $item['id'],
-                'type' => 'customers',
-            ];
-
-            $outputItem['attributes'] = $this->dasherizeKeys($item);
-
-            $output['data'][] = $outputItem;
-        }
+        $output = [
+            'data'  => [
+                'id'         => $data['id'],
+                'type'       => 'customer',
+                'attributes' => $this->dasherizeKeys($data),
+            ],
+            'links' => [
+                'self' => env('APP_URL') . '/api/customer/' . $data['id'],
+            ],
+        ];
 
         return $output;
     }

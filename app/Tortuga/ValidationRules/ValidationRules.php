@@ -9,4 +9,9 @@ interface ValidationRules
      * @return array
      */
     public function get(): array;
+
+    /**
+     * @return array Field names
+     */
+    public function keys(): array;
 }

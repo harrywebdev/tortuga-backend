@@ -20,4 +20,12 @@ class FacebookCustomerValidationRules implements ValidationRules
             'mobile'      => 'nullable|regex:/^[0-9 \+]{9,}$/i|max:191',
         ];
     }
+
+    /**
+     * @return array Field names
+     */
+    public function keys(): array
+    {
+        return ['name', 'email', 'faebook_id', 'mobile'];
+    }
 }

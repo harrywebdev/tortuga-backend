@@ -23,6 +23,10 @@ class GetCategoriesApiTransformer implements ApiTransformer
             $output['data'][] = $outputItem;
         }
 
+        $output['links'] = [
+            'self' => env('APP_URL') . '/api/categories',
+        ];
+
         return $output;
     }
 }

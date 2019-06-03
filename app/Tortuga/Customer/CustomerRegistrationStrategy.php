@@ -3,9 +3,12 @@
 namespace Tortuga\Customer;
 
 use App\Customer;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Tortuga\Api\InvalidAttributeException;
 use Tortuga\ValidationRules\Customer\EmailCustomerValidationRules;
+use Tortuga\ValidationRules\Customer\MobileCustomerValidationRules;
+use Tortuga\ValidationRules\ValidationRules;
 
 class CustomerRegistrationStrategy
 {
@@ -20,28 +23,33 @@ class CustomerRegistrationStrategy
                 return $this->_registerCustomerViaFacebook($customerData);
             default:
                 throw new InvalidAttributeException('reg_type',
-                    'Registraton Type must be one of following: "email", "mobile", "facebook"', !$registrationType);
+                    'Registration Type must be one of following: "email", "mobile", "facebook"', !$registrationType);
         }
     }
 
+    /**
+     * @param array $customerData
+     * @return Customer
+     * @throws InvalidAttributeException
+     * @throws \Exception
+     */
     private function _registerCustomerViaEmail(array $customerData): Customer
     {
-        $validator = Validator::make($customerData, (new EmailCustomerValidationRules())->get());
+        $customerData = $this->_validateCustomerData($customerData, (new EmailCustomerValidationRules()));
 
-        if ($validator->fails()) {
-            foreach ($validator->errors()->toArray() as $attribute => $message) {
-                throw new InvalidAttributeException($attribute, $message[0]);
-            }
-        }
-
-        $customer = new Customer($customerData);
-
-        return $customer;
+        throw new \Exception('Registration via email is not supported at the moment');
     }
 
+    /**
+     * @param array $customerData
+     * @return Customer
+     */
     private function _registerCustomerViaMobile(array $customerData): Customer
     {
+        $customerData = $this->_validateCustomerData($customerData, (new MobileCustomerValidationRules()));
+
         $customer = new Customer($customerData);
+        $customer->save();
 
         return $customer;
     }
@@ -51,5 +59,24 @@ class CustomerRegistrationStrategy
         $customer = new Customer($customerData);
 
         return $customer;
+    }
+
+    /**
+     * @param array           $customerData
+     * @param ValidationRules $validationRules
+     * @return array
+     * @throws InvalidAttributeException
+     */
+    private function _validateCustomerData(array $customerData, ValidationRules $validationRules): array
+    {
+        $validator = Validator::make($customerData, $validationRules->get());
+
+        if ($validator->fails()) {
+            foreach ($validator->errors()->toArray() as $attribute => $message) {
+                throw new InvalidAttributeException($attribute, $message[0]);
+            }
+        }
+
+        return Arr::only($customerData, $validationRules->keys());
     }
 }

@@ -48,6 +48,10 @@ class GetProductsApiTransformer implements ApiTransformer
             $output['data'][] = $outputItem;
         }
 
+        $output['links'] = [
+            'self' => env('APP_URL') . '/api/products',
+        ];
+
         return $output;
     }
 
