@@ -56,6 +56,14 @@ class CustomerRegistrationStrategy
         try {
             $accountData = FacebookAccountKitFacade::getAccountDataByCode($customerData['code']);
 
+            $customer = Customer::where('account_kit_id', '=', $accountData->id)
+                ->where('reg_type', '=', 'mobile')
+                ->first();
+
+            if ($customer) {
+                return $customer;
+            }
+
             $customer                         = new Customer();
             $customer->reg_type               = 'mobile';
             $customer->name                   = $customerData['name'];
@@ -89,6 +97,14 @@ class CustomerRegistrationStrategy
             /** @var FacebookResponse $response */
             $response = Facebook::get('/me?fields=id,name,email', $customerData['access_token']);
             $userNode = $response->getGraphUser();
+
+            $customer = Customer::where('facebook_id', '=', $userNode->getId())
+                ->where('reg_type', '=', 'facebook')
+                ->first();
+
+            if ($customer) {
+                return $customer;
+            }
 
             $customer              = new Customer();
             $customer->reg_type    = 'facebook';
