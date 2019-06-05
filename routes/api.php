@@ -67,7 +67,7 @@ Route::post('/customers', function (Request $request) {
     } catch (InvalidAttributeException $e) {
         return response()->json((object)['errors' => [(object)[
             'status' => 422,
-            'source' => (object)['pointer' => '/data/attributes/' . $e->getAttribute()],
+            'source' => (object)['pointer' => $e->getPath()],
             'title'  => $e->getMessage(),
             'detail' => $e->getDetail(),
         ],]], 400);

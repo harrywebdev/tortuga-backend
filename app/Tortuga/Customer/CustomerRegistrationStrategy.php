@@ -17,6 +17,12 @@ use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
 
 class CustomerRegistrationStrategy
 {
+    /**
+     * @param string $registrationType email|mobile|facebook
+     * @param array  $customerData
+     * @return Customer
+     * @throws InvalidAttributeException
+     */
     public function registerCustomer(string $registrationType, array $customerData): Customer
     {
         switch ($registrationType) {
@@ -27,8 +33,11 @@ class CustomerRegistrationStrategy
             case 'facebook':
                 return $this->_registerCustomerViaFacebook($customerData);
             default:
-                throw new InvalidAttributeException('reg_type',
-                    'Registration Type must be one of following: "email", "mobile", "facebook"', !$registrationType);
+                throw new InvalidAttributeException(
+                    'reg_type',
+                    'Registration Type must be one of following: "email", "mobile", "facebook"',
+                    !$registrationType
+                );
         }
     }
 

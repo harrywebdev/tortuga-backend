@@ -14,16 +14,23 @@ class InvalidAttributeException extends \Exception
     private $detail;
 
     /**
+     * @var string
+     */
+    private $path;
+
+    /**
      * InvalidAttributeException constructor.
      * @param string $attribute
      * @param string $detail
      * @param bool   $isMissing
+     * @param string $path
      */
-    public function __construct(string $attribute, $detail = '', $isMissing = false)
+    public function __construct(string $attribute, $detail = '', $isMissing = false, $path = '/data/attributes')
     {
         parent::__construct(($isMissing ? 'Missing' : 'Invalid') . ' Attribute', 400);
         $this->attribute = $attribute;
         $this->detail    = $detail;
+        $this->path      = $path . '/' . $attribute;
     }
 
     /**
@@ -40,5 +47,13 @@ class InvalidAttributeException extends \Exception
     public function getDetail(): string
     {
         return $this->detail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
     }
 }
