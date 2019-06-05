@@ -66,7 +66,6 @@ class CustomerRegistrationStrategy
 
             $customer                         = new Customer();
             $customer->reg_type               = 'mobile';
-            $customer->name                   = $customerData['name'];
             $customer->mobile_number          = $accountData->phone->number;
             $customer->mobile_country_prefix  = $accountData->phone->country_prefix;
             $customer->mobile_national_number = $accountData->phone->national_number;

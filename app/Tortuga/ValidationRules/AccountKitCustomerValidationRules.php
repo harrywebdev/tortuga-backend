@@ -13,7 +13,6 @@ class AccountKitCustomerValidationRules implements ValidationRules
     {
         return [
             'code' => 'required|string|max:512',
-            'name' => 'required|string|max:191',
         ];
     }
 
@@ -22,6 +21,6 @@ class AccountKitCustomerValidationRules implements ValidationRules
      */
     public function keys(): array
     {
-        return ['code', 'name'];
+        return ['code'];
     }
 }
