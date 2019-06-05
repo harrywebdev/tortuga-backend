@@ -41,9 +41,10 @@ Route::get('/products', function (Request $request) {
 });
 
 Route::post('/customers', function (Request $request) {
-    $strategy = new CustomerRegistrationStrategy();
-
     try {
+        /** @var CustomerRegistrationStrategy $strategy */
+        $strategy = app()->make(CustomerRegistrationStrategy::class);
+
         $resourceType = $request->input('data.type', '');
         if (!$resourceType || $resourceType !== 'customers') {
             throw new InvalidResourceException($resourceType);

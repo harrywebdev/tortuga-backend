@@ -1,6 +1,6 @@
 <?php
 
-namespace Tortuga\ValidationRules;
+namespace Tortuga\Validation;
 
 interface ValidationRules
 {

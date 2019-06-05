@@ -1,6 +1,6 @@
 <?php
 
-namespace Tortuga\ValidationRules;
+namespace Tortuga\Validation;
 
 class FacebookLoginCustomerValidationRules implements ValidationRules
 {
@@ -21,6 +21,6 @@ class FacebookLoginCustomerValidationRules implements ValidationRules
      */
     public function keys(): array
     {
-        return ['access_token'];
+        return array_keys($this->get());
     }
 }

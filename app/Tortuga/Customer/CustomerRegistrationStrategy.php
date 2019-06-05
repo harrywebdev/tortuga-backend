@@ -5,18 +5,30 @@ namespace Tortuga\Customer;
 use App\Customer;
 use Facebook\FacebookResponse;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator;
 use SammyK\LaravelFacebookSdk\FacebookFacade as Facebook;
 use Tortuga\Api\AccountKitException;
 use Tortuga\Api\InvalidAttributeException;
-use Tortuga\ValidationRules\AccountKitCustomerValidationRules;
-use Tortuga\ValidationRules\FacebookLoginCustomerValidationRules;
-use Tortuga\ValidationRules\ValidationRules;
+use Tortuga\Validation\AccountKitCustomerRegistrationValidationRules;
+use Tortuga\Validation\FacebookLoginCustomerValidationRules;
 use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
+use Tortuga\Validation\Validator;
 
 class CustomerRegistrationStrategy
 {
+    /**
+     * @var Validator
+     */
+    private $validator;
+
+    /**
+     * CustomerRegistrationStrategy constructor.
+     * @param Validator $validator
+     */
+    function __construct(Validator $validator)
+    {
+        $this->validator = $validator;
+    }
+
     /**
      * @param string $registrationType email|mobile|facebook
      * @param array  $customerData
@@ -49,7 +61,10 @@ class CustomerRegistrationStrategy
      */
     private function _registerCustomerViaEmail(array $customerData): Customer
     {
-        $customerData = $this->_validateCustomerData($customerData, (new AccountKitCustomerValidationRules()));
+        $customerData = $this->validator->validate(
+            $customerData,
+            new AccountKitCustomerRegistrationValidationRules()
+        );
 
         throw new \Exception('Registration via email is not supported at the moment');
     }
@@ -60,7 +75,10 @@ class CustomerRegistrationStrategy
      */
     private function _registerCustomerViaMobile(array $customerData): Customer
     {
-        $customerData = $this->_validateCustomerData($customerData, (new AccountKitCustomerValidationRules()));
+        $customerData = $this->validator->validate(
+            $customerData,
+            new AccountKitCustomerRegistrationValidationRules()
+        );
 
         try {
             $accountData = FacebookAccountKitFacade::getAccountDataByCode($customerData['code']);
@@ -99,7 +117,10 @@ class CustomerRegistrationStrategy
      */
     private function _registerCustomerViaFacebook(array $customerData): Customer
     {
-        $customerData = $this->_validateCustomerData($customerData, (new FacebookLoginCustomerValidationRules()));
+        $customerData = $this->validator->validate(
+            $customerData,
+            new FacebookLoginCustomerValidationRules()
+        );
 
         try {
             /** @var FacebookResponse $response */
@@ -126,24 +147,5 @@ class CustomerRegistrationStrategy
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
             throw new \Exception($e->getMessage());
         }
-    }
-
-    /**
-     * @param array           $customerData
-     * @param ValidationRules $validationRules
-     * @return array
-     * @throws InvalidAttributeException
-     */
-    private function _validateCustomerData(array $customerData, ValidationRules $validationRules): array
-    {
-        $validator = Validator::make($customerData, $validationRules->get());
-
-        if ($validator->fails()) {
-            foreach ($validator->errors()->toArray() as $attribute => $message) {
-                throw new InvalidAttributeException($attribute, $message[0]);
-            }
-        }
-
-        return Arr::only($customerData, $validationRules->keys());
     }
 }

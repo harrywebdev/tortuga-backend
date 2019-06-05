@@ -1,8 +1,8 @@
 <?php
 
-namespace Tortuga\ValidationRules;
+namespace Tortuga\Validation;
 
-class AccountKitCustomerValidationRules implements ValidationRules
+class AccountKitCustomerUpdateValidationRules implements ValidationRules
 {
 
     /**
@@ -12,7 +12,8 @@ class AccountKitCustomerValidationRules implements ValidationRules
     public function get(): array
     {
         return [
-            'code' => 'required|string|max:512',
+            'name'  => 'required|string|max:512',
+            'email' => 'nullable|email|max:191',
         ];
     }
 
@@ -21,6 +22,6 @@ class AccountKitCustomerValidationRules implements ValidationRules
      */
     public function keys(): array
     {
-        return ['code'];
+        return array_keys($this->get());
     }
 }
