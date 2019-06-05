@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrderProductVariationTable extends Migration
+class CreateOrderItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,18 @@ class CreateOrderProductVariationTable extends Migration
      */
     public function up()
     {
-        Schema::create('order_product_variation', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->unsignedInteger('order_id');
-            $table->unsignedInteger('product_variation_id');
+
+            // product title + product variation title
+            $table->string('title');
+
+            $table->integer('price');
+            $table->integer('quantity');
+            $table->integer('total_price');
+            $table->string('currency', 3)->default('CZK');
 
             $table->foreign('order_id')->references('id')->on('orders');
-            $table->foreign('product_variation_id')->references('id')->on('product_variations');
         });
     }
 
@@ -29,6 +35,6 @@ class CreateOrderProductVariationTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_product_variation');
+        Schema::dropIfExists('order_items');
     }
 }

@@ -15,10 +15,10 @@ class Order extends Model
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function items()
     {
-        return $this->belongsToMany(ProductVariation::class);
+        return $this->hasMany(OrderItem::class);
     }
 }

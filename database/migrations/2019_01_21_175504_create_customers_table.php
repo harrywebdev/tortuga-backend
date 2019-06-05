@@ -17,7 +17,7 @@ class CreateCustomersTable extends Migration
             $table->increments('id');
 
             $table->enum('reg_type', ['email', 'mobile', 'facebook']);
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('mobile_number')->nullable();
             $table->string('mobile_country_prefix')->nullable();

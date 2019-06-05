@@ -17,14 +17,20 @@ class CreateOrdersTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('customer_id');
 
+            $table->enum('delivery_type', ['pickup', 'delivery'])->default('pickup');
+            $table->enum('payment_type', ['cash', 'card'])->default('cash');
+            $table->string('pickup_time', 5)->nullable();
+
             $table->enum('status', [
                 'received', 'rejected', 'accepted', 'processing', 'done', 'delivered', 'failed',
             ])->default('received');
 
-            $table->integer('total_amount');
+            $table->unsignedMediumInteger('subtotal_amount');
+            $table->unsignedMediumInteger('delivery_amount');
+            $table->unsignedMediumInteger('extra_amount');
+            $table->unsignedMediumInteger('total_amount');
             $table->string('currency', 3)->default('CZK');
 
-            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('customers');
