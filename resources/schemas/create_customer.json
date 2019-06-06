@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://api.tortuga.com/customer.json#",
+  "title": "Create a Customer validation",
+  "type": "object",
+  "required": [
+    "data"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "type",
+        "attributes"
+      ],
+      "properties": {
+        "type": {
+          "const": "customers",
+          "required": true
+        },
+        "attributes": {
+          "type": "object",
+          "required": [
+            "reg_type",
+            "code"
+          ],
+          "properties": {
+            "reg_type": {
+              "type": "string",
+              "anyOf": [
+                {
+                  "const": "mobile"
+                },
+                {
+                  "const": "facebook"
+                }
+              ]
+            },
+            "code": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 191
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

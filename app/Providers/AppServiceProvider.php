@@ -26,6 +26,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Validator::class, LaravelValidator::class);
     }
 }

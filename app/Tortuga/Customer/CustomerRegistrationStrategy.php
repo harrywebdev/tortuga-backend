@@ -7,81 +7,55 @@ use Facebook\FacebookResponse;
 use GuzzleHttp\Exception\ClientException;
 use SammyK\LaravelFacebookSdk\FacebookFacade as Facebook;
 use Tortuga\Api\AccountKitException;
-use Tortuga\Api\InvalidAttributeException;
-use Tortuga\Validation\AccountKitCustomerRegistrationValidationRules;
-use Tortuga\Validation\FacebookLoginCustomerValidationRules;
 use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
-use Tortuga\Validation\Validator;
+use Tortuga\Validation\JsonSchemaValidator;
 
 class CustomerRegistrationStrategy
 {
     /**
-     * @var Validator
+     * @var JsonSchemaValidator
      */
     private $validator;
 
     /**
      * CustomerRegistrationStrategy constructor.
-     * @param Validator $validator
+     * @param JsonSchemaValidator $validator
      */
-    function __construct(Validator $validator)
+    function __construct(JsonSchemaValidator $validator)
     {
         $this->validator = $validator;
     }
 
     /**
-     * @param string $registrationType email|mobile|facebook
-     * @param array  $customerData
+     * @param object $customerData
      * @return Customer
-     * @throws InvalidAttributeException
-     */
-    public function registerCustomer(string $registrationType, array $customerData): Customer
-    {
-        switch ($registrationType) {
-            case 'email':
-                return $this->_registerCustomerViaEmail($customerData);
-            case 'mobile':
-                return $this->_registerCustomerViaMobile($customerData);
-            case 'facebook':
-                return $this->_registerCustomerViaFacebook($customerData);
-            default:
-                throw new InvalidAttributeException(
-                    'reg_type',
-                    'Registration Type must be one of following: "email", "mobile", "facebook"',
-                    !$registrationType
-                );
-        }
-    }
-
-    /**
-     * @param array $customerData
-     * @return Customer
-     * @throws InvalidAttributeException
      * @throws \Exception
      */
-    private function _registerCustomerViaEmail(array $customerData): Customer
+    public function registerCustomer(object $customerData): Customer
     {
-        $customerData = $this->validator->validate(
+        $this->validator->validate(
             $customerData,
-            new AccountKitCustomerRegistrationValidationRules()
+            file_get_contents(resource_path('schemas/create_customer.json'))
         );
 
-        throw new \Exception('Registration via email is not supported at the moment');
+        switch ($customerData->data->attributes->reg_type) {
+            case 'mobile':
+                return $this->_registerCustomerViaMobile($customerData->data->attributes);
+            case 'facebook':
+                return $this->_registerCustomerViaFacebook($customerData->data->attributes);
+        }
+
+        throw new \Exception('Create Customer Validation fail: unsupported `reg_type`');
     }
 
     /**
-     * @param array $customerData
+     * @param object $customerData
      * @return Customer
      */
-    private function _registerCustomerViaMobile(array $customerData): Customer
+    private function _registerCustomerViaMobile(object $customerData): Customer
     {
-        $customerData = $this->validator->validate(
-            $customerData,
-            new AccountKitCustomerRegistrationValidationRules()
-        );
-
         try {
-            $accountData = FacebookAccountKitFacade::getAccountDataByCode($customerData['code']);
+            $accountData = FacebookAccountKitFacade::getAccountDataByCode($customerData->code);
 
             $customer = Customer::where('account_kit_id', '=', $accountData->id)
                 ->where('reg_type', '=', 'mobile')
@@ -112,19 +86,14 @@ class CustomerRegistrationStrategy
     }
 
     /**
-     * @param array $customerData
+     * @param object $customerData
      * @return Customer
      */
-    private function _registerCustomerViaFacebook(array $customerData): Customer
+    private function _registerCustomerViaFacebook(object $customerData): Customer
     {
-        $customerData = $this->validator->validate(
-            $customerData,
-            new FacebookLoginCustomerValidationRules()
-        );
-
         try {
             /** @var FacebookResponse $response */
-            $response = Facebook::get('/me?fields=id,name,email', $customerData['access_token']);
+            $response = Facebook::get('/me?fields=id,name,email', $customerData->code);
             $userNode = $response->getGraphUser();
 
             $customer = Customer::where('facebook_id', '=', $userNode->getId())

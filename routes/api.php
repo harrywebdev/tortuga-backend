@@ -4,8 +4,7 @@ use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
 use Tortuga\Api\AccountKitException;
-use Tortuga\Api\InvalidAttributeException;
-use Tortuga\Api\InvalidResourceException;
+use Tortuga\Api\InvalidDataException;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
 use Tortuga\ApiTransformer\GetCustomerApiTransformer;
 use Tortuga\ApiTransformer\GetProductsApiTransformer;
@@ -45,32 +44,16 @@ Route::post('/customers', function (Request $request) {
         /** @var CustomerRegistrationStrategy $strategy */
         $strategy = app()->make(CustomerRegistrationStrategy::class);
 
-        $resourceType = $request->input('data.type', '');
-        if (!$resourceType || $resourceType !== 'customers') {
-            throw new InvalidResourceException($resourceType);
-        }
-
-        $customer    = $strategy->registerCustomer(
-            $request->input('data.attributes.reg_type', ''),
-            $request->input('data.attributes', [])
-        );
+        $customer    = $strategy->registerCustomer(json_decode($request->getContent()));
         $transformer = new GetCustomerApiTransformer();
 
         return response()->json($transformer->output($customer->toArray()));
-    } catch (InvalidResourceException $e) {
+    } catch (InvalidDataException $e) {
         return response()->json((object)['errors' => [(object)[
             'status' => 422,
-            'source' => (object)['pointer' => '/data/type'],
-            'title'  => $e->getMessage(),
-            'detail' => sprintf('Invalid resource type "%s" supplied instead of "%s"', $e->getResourceType(),
-                'customers'),
-        ],]], 400);
-    } catch (InvalidAttributeException $e) {
-        return response()->json((object)['errors' => [(object)[
-            'status' => 422,
-            'source' => (object)['pointer' => $e->getPath()],
-            'title'  => $e->getMessage(),
-            'detail' => $e->getDetail(),
+            'source' => (object)['pointer' => $e->getDataPointer()],
+            'title'  => 'JSON Schema Validation error',
+            'detail' => $e->getMessage(),
         ],]], 400);
     } catch (AccountKitException $e) {
         return response()->json((object)['errors' => [(object)[
