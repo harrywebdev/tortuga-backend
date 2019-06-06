@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Tortuga\ApiTransformer\GetOrderApiTransformer;
 use Tortuga\Order\OrderCreationStrategy;
 use Tortuga\Validation\InvalidDataException;
 
@@ -18,11 +19,10 @@ class OrderController extends Controller
             /** @var OrderCreationStrategy $strategy */
             $strategy = app()->make(OrderCreationStrategy::class);
 
-            $order = $strategy->createOrder(json_decode($request->getContent()));
-            dd($order);
-//            $transformer = new GetOrderApiTransformer();
+            $order       = $strategy->createOrder(json_decode($request->getContent()));
+            $transformer = new GetOrderApiTransformer();
 
-//            return response()->json($transformer->output($order->toArray()));
+            return response()->json($transformer->output($order->toArray()));
         } catch (InvalidDataException $e) {
             return response()->json((object)['errors' => [(object)[
                 'status' => 422,
