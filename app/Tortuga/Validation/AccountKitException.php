@@ -1,6 +1,6 @@
 <?php
 
-namespace Tortuga\Api;
+namespace Tortuga\Validation;
 
 use Throwable;
 

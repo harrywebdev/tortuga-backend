@@ -6,8 +6,8 @@ use App\Customer;
 use Facebook\FacebookResponse;
 use GuzzleHttp\Exception\ClientException;
 use SammyK\LaravelFacebookSdk\FacebookFacade as Facebook;
-use Tortuga\Api\AccountKitException;
 use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
+use Tortuga\Validation\AccountKitException;
 use Tortuga\Validation\JsonSchemaValidator;
 
 class CustomerRegistrationStrategy

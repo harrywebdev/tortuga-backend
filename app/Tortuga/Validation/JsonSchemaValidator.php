@@ -4,7 +4,7 @@ namespace Tortuga\Validation;
 
 use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator as OpisValidator;
-use Tortuga\Api\InvalidDataException;
+use Tortuga\Validation\InvalidDataException;
 
 class JsonSchemaValidator
 {

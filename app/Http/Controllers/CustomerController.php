@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Tortuga\Api\AccountKitException;
-use Tortuga\Api\InvalidDataException;
+use Tortuga\Validation\AccountKitException;
+use Tortuga\Validation\InvalidDataException;
 use Tortuga\ApiTransformer\GetCustomerApiTransformer;
 use Tortuga\Customer\CustomerRegistrationStrategy;
 
