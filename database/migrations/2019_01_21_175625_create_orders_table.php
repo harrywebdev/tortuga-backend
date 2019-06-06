@@ -22,8 +22,8 @@ class CreateOrdersTable extends Migration
             $table->string('pickup_time', 5)->nullable();
 
             $table->enum('status', [
-                'received', 'rejected', 'accepted', 'processing', 'done', 'delivered', 'failed',
-            ])->default('received');
+                'incomplete', 'received', 'rejected', 'accepted', 'processing', 'done', 'delivered', 'failed',
+            ])->default('incomplete');
 
             $table->unsignedMediumInteger('subtotal_amount');
             $table->unsignedMediumInteger('delivery_amount');
@@ -32,6 +32,7 @@ class CreateOrdersTable extends Migration
             $table->string('currency', 3)->default('CZK');
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('customer_id')->references('id')->on('customers');
         });

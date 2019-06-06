@@ -36,6 +36,7 @@ Route::get('/products', function (Request $request) {
 });
 
 Route::post('/customers', 'CustomerController@create');
+Route::post('/orders', 'OrderController@create');
 
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);

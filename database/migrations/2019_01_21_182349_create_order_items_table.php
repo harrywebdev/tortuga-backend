@@ -24,6 +24,9 @@ class CreateOrderItemsTable extends Migration
             $table->integer('total_price');
             $table->string('currency', 3)->default('CZK');
 
+            $table->timestamps();
+            $table->softDeletes();
+
             $table->foreign('order_id')->references('id')->on('orders');
         });
     }
