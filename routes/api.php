@@ -3,12 +3,8 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
-use Tortuga\Api\AccountKitException;
-use Tortuga\Api\InvalidDataException;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
-use Tortuga\ApiTransformer\GetCustomerApiTransformer;
 use Tortuga\ApiTransformer\GetProductsApiTransformer;
-use Tortuga\Customer\CustomerRegistrationStrategy;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,37 +35,7 @@ Route::get('/products', function (Request $request) {
     return response()->json($transformer->output($products));
 });
 
-Route::post('/customers', function (Request $request) {
-    try {
-        /** @var CustomerRegistrationStrategy $strategy */
-        $strategy = app()->make(CustomerRegistrationStrategy::class);
-
-        $customer    = $strategy->registerCustomer(json_decode($request->getContent()));
-        $transformer = new GetCustomerApiTransformer();
-
-        return response()->json($transformer->output($customer->toArray()));
-    } catch (InvalidDataException $e) {
-        return response()->json((object)['errors' => [(object)[
-            'status' => 422,
-            'source' => (object)['pointer' => $e->getDataPointer()],
-            'title'  => 'JSON Schema Validation error',
-            'detail' => $e->getMessage(),
-        ],]], 400);
-    } catch (AccountKitException $e) {
-        return response()->json((object)['errors' => [(object)[
-            'status' => 401,
-            'source' => (object)['pointer' => '/data/attributes/code'],
-            'title'  => $e->getMessage(),
-            'detail' => $e->getMessage(),
-        ],]], 400);
-    } catch (\Exception $e) {
-        return response()->json((object)['errors' => [(object)[
-            'status' => 500,
-            'title'  => 'Internal Server Error',
-            'detail' => $e->getMessage(),
-        ],]], 500);
-    }
-});
+Route::post('/customers', 'CustomerController@create');
 
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);
