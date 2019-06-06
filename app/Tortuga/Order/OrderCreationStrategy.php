@@ -2,6 +2,7 @@
 
 namespace Tortuga\Order;
 
+use App\Customer;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
@@ -66,6 +67,15 @@ class OrderCreationStrategy
         $order->total_amount    = $order->subtotal_amount;
         $order->status          = 'received';
         $order->save();
+
+        // also update Customer
+        try {
+            $order->customer->name = $orderData->data->relationships->customer->data->attributes->name;
+            $order->customer->save();
+        } catch (\Exception $e) {
+            // it's not critical so just report to tracker
+            // TODO: error reporting to like honeybadger
+        }
 
         return $order;
     }
