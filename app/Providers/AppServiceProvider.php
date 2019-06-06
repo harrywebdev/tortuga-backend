@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Tortuga\Validation\JsonSchemaValidator;
 use Tortuga\Validation\LaravelValidator;
 use Tortuga\Validation\Validator;
 
@@ -26,5 +27,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('Tortuga\Validation\JsonSchemaValidator', function ($app) {
+            return new JsonSchemaValidator();
+        });
     }
 }

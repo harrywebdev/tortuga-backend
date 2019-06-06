@@ -35,7 +35,7 @@ class CustomerRegistrationStrategy
     {
         $this->validator->validate(
             $customerData,
-            file_get_contents(resource_path('schemas/create_customer.json'))
+            'http://localhost/create_customer.json'
         );
 
         switch ($customerData->data->attributes->reg_type) {
