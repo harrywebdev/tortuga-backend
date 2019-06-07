@@ -2,7 +2,7 @@
 
 namespace Tortuga\Order;
 
-use App\Customer;
+use App\Events\OrderReceived;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
@@ -76,6 +76,8 @@ class OrderCreationStrategy
             // it's not critical so just report to tracker
             // TODO: error reporting to like honeybadger
         }
+
+        event(new OrderReceived($order));
 
         return $order;
     }
