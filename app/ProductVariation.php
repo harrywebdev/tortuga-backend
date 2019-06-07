@@ -4,9 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductVariation extends Model
 {
+    use SoftDeletes;
+
     /**
      * {@inheritDoc}
      */
@@ -25,6 +28,14 @@ class ProductVariation extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class);
     }
 
     /**

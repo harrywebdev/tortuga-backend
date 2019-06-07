@@ -3,8 +3,8 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\CategoriesApiTransformer;
-use Tortuga\ApiTransformer\ProductsApiTransformer;
+use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
+use Tortuga\ApiTransformer\GetProductsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,20 +21,23 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('cors')->get('/categories', function (Request $request) {
+Route::get('/categories', function (Request $request) {
     $categories  = Category::has('products')->ordered()->get()->toArray();
-    $transformer = new CategoriesApiTransformer();
+    $transformer = new GetCategoriesApiTransformer();
 
-    return response()->json($transformer->output($categories, 'categories'));
+    return response()->json($transformer->output($categories));
 });
 
-Route::middleware('cors')->get('/products', function (Request $request) {
+Route::get('/products', function (Request $request) {
     $products    = Product::with('variations')->ordered()->get()->toArray();
-    $transformer = new ProductsApiTransformer();
+    $transformer = new GetProductsApiTransformer();
 
     return response()->json($transformer->output($products));
 });
 
+Route::post('/customers', 'CustomerController@create');
+Route::post('/orders', 'OrderController@create');
+
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);
-})->name('api.fallback.404')->middleware('cors');
+})->name('api.fallback.404');

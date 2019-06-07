@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://localhost/update_customer.json#",
+  "title": "Update a Customer validation",
+  "type": "object",
+  "required": [
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "type",
+        "attributes",
+        "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "customers"
+        },
+        "attributes": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "name": {
+              "type": "string",
+              "maxLength": 191,
+              "minLength": 2
+            }
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

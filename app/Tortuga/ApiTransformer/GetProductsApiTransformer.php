@@ -2,7 +2,9 @@
 
 namespace Tortuga\ApiTransformer;
 
-class ProductsApiTransformer implements ApiTransformer
+use Illuminate\Support\Arr;
+
+class GetProductsApiTransformer implements ApiTransformer
 {
     /**
      * @param array $data
@@ -17,13 +19,10 @@ class ProductsApiTransformer implements ApiTransformer
                 'type' => 'products',
             ];
 
-            $variations = $item['variations'];
-            unset($item['id'], $item['variations']);
-
-            $outputItem['attributes']    = $this->dasherizeKeys($item);
+            $outputItem['attributes']    = Arr::except($item, ['id', 'variations']);
             $outputItem['relationships'] = ['variations' => ['data' => []]];
 
-            foreach ($variations as $variation) {
+            foreach ($item['variations'] as $variation) {
                 $variationItem = [
                     'id'   => $variation['id'],
                     'type' => 'variations',
@@ -37,33 +36,21 @@ class ProductsApiTransformer implements ApiTransformer
                 // format price
                 // TODO: refactor into proper Locale based on request headers
                 setlocale(LC_MONETARY, 'cs_CZ');
-                $variation['price'] = money_format('%.0n', $variation['price'] / 100);
+                $variation['formatted_price']    = money_format('%.0n', $variation['price'] / 100);
+                $variation['formatted_currency'] = localeconv()['currency_symbol'];
                 unset($variation['currency']);
 
-                $variationItem['attributes'] = $this->dasherizeKeys($variation);
+                $variationItem['attributes'] = $variation;
                 $output['included'][]        = $variationItem;
             }
 
             $output['data'][] = $outputItem;
         }
 
+        $output['links'] = [
+            'self' => env('APP_URL') . '/api/products',
+        ];
+
         return $output;
-    }
-
-    /**
-     * Swap underscore for dash in attribute keys
-     * @param array $attributes
-     * @return array
-     */
-    private function dasherizeKeys(array $attributes): array
-    {
-        foreach ($attributes as $key => $attribute) {
-            if (strpos($key, '_')) {
-                $attributes[str_replace('_', '-', $key)] = $attribute;
-                unset($attributes[$key]);
-            }
-        }
-
-        return $attributes;
     }
 }

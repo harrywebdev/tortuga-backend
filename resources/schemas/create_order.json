@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://localhost/create_order.json#",
+  "title": "Create an Order validation",
+  "type": "object",
+  "required": [
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "type",
+        "attributes",
+        "relationships"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "orders"
+        },
+        "attributes": {
+          "type": "object",
+          "required": [
+            "delivery_type",
+            "payment_type",
+            "pickup_time"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "delivery_type": {
+              "type": "string",
+              "anyOf": [
+                {
+                  "const": "pickup"
+                }
+              ]
+            },
+            "payment_type": {
+              "type": "string",
+              "anyOf": [
+                {
+                  "const": "cash"
+                }
+              ]
+            },
+            "pickup_time": {
+              "type": "string",
+              "pattern": "^[0-9]{2}:[0-9]{2}$"
+            }
+          }
+        },
+        "relationships": {
+          "type": "object",
+          "required": [
+            "items",
+            "customer"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "type": "object",
+              "required": [
+                "data"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "http://localhost/create_order_item.json#"
+                  }
+                }
+              }
+            },
+            "customer": {
+              "$ref": "http://localhost/update_customer.json#"
+            }
+          }
+        }
+      }
+    }
+  }
+}

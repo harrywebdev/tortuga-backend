@@ -2,7 +2,9 @@
 
 namespace Tortuga\ApiTransformer;
 
-class CategoriesApiTransformer implements ApiTransformer
+use Illuminate\Support\Arr;
+
+class GetCategoriesApiTransformer implements ApiTransformer
 {
     /**
      * @param array $data
@@ -17,11 +19,14 @@ class CategoriesApiTransformer implements ApiTransformer
                 'type' => 'categories',
             ];
 
-            unset($item['id'], $item['parent_id']);
-            $outputItem['attributes'] = $item;
+            $outputItem['attributes'] = Arr::except($item, ['id', 'parent_id']);
 
             $output['data'][] = $outputItem;
         }
+
+        $output['links'] = [
+            'self' => env('APP_URL') . '/api/categories',
+        ];
 
         return $output;
     }
