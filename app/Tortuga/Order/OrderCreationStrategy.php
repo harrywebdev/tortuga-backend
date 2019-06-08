@@ -40,7 +40,7 @@ class OrderCreationStrategy
         $order->delivery_type   = $orderData->data->attributes->delivery_type;
         $order->payment_type    = $orderData->data->attributes->payment_type;
         $order->pickup_time     = $orderData->data->attributes->pickup_time;
-        $order->status          = 'incomplete';
+        $order->status          = OrderStatus::INCOMPLETE();
         $order->subtotal_amount = 0;
         $order->total_amount    = 0;
         $order->delivery_amount = 0;
@@ -65,7 +65,7 @@ class OrderCreationStrategy
 
         $order->subtotal_amount = $subtotal;
         $order->total_amount    = $order->subtotal_amount;
-        $order->status          = 'received';
+        $order->status          = OrderStatus::RECEIVED();
         $order->save();
 
         // also update Customer

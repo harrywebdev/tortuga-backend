@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Tortuga\Order\OrderStatus;
 
 class CreateOrdersTable extends Migration
 {
@@ -21,15 +22,20 @@ class CreateOrdersTable extends Migration
             $table->enum('payment_type', ['cash', 'card'])->default('cash');
             $table->string('pickup_time', 5)->nullable();
 
-            $table->enum('status', [
-                'incomplete', 'received', 'rejected', 'accepted', 'processing', 'done', 'delivered', 'failed',
-            ])->default('incomplete');
+            $table->enum('status', OrderStatus::keys())->default(OrderStatus::INCOMPLETE());
+            $table->boolean('is_auto_accepted')->default(false);
+            $table->boolean('is_overload')->default(false);
 
+            $table->unsignedMediumInteger('total_amount');
             $table->unsignedMediumInteger('subtotal_amount');
             $table->unsignedMediumInteger('delivery_amount');
             $table->unsignedMediumInteger('extra_amount');
-            $table->unsignedMediumInteger('total_amount');
             $table->string('currency', 3)->default('CZK');
+
+            $table->boolean('is_touched')->default(false);
+            $table->string('touched_reason')->nullable();
+            $table->string('reject_reason')->nullable();
+            $table->string('cancelled_reason')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

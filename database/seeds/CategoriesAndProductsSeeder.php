@@ -13,14 +13,16 @@ class CategoriesAndProductsSeeder extends Seeder
      */
     public function run()
     {
-        $categories = ['Hlavni jidlo', 'Priloha'];
+        $categories       = ['Hlavni jidlo', 'Priloha', 'Piti'];
+        $categoriesEmojis = ['🍔', '🍟', '💧'];
 
         $sequence = 0;
-        foreach ($categories as $category) {
+        foreach ($categories as $key => $category) {
             $slug     = str_slug($category);
             $sequence += 100;
 
-            Category::firstOrCreate(['slug' => $slug], ['title' => $category, 'sequence' => $sequence]);
+            Category::firstOrCreate(['slug' => $slug],
+                ['title' => $category, 'sequence' => $sequence, 'emoji' => $categoriesEmojis[$key]]);
         }
 
         $mainCategory = Category::ofSlug('hlavni-jidlo')->first();
@@ -29,6 +31,7 @@ class CategoriesAndProductsSeeder extends Seeder
         $admiral = Product::firstOrCreate(['slug' => 'admiral'], [
             'title'       => 'Admiral',
             'sequence'    => 100,
+            'heat'        => 100,
             'description' => 'Tortuga signature burger',
             'category_id' => $mainCategory->id,
         ]);
@@ -45,6 +48,7 @@ class CategoriesAndProductsSeeder extends Seeder
         $bucaneer = Product::firstOrCreate(['slug' => 'bucaneer'], [
             'title'       => 'Bucaneer',
             'sequence'    => 200,
+            'heat'        => 150,
             'description' => 'Tortuga VIP burger',
             'category_id' => $mainCategory->id,
         ]);
@@ -61,6 +65,7 @@ class CategoriesAndProductsSeeder extends Seeder
         $havana = Product::firstOrCreate(['slug' => 'havana'], [
             'title'       => 'Havana',
             'sequence'    => 300,
+            'heat'        => 100,
             'description' => 'Tortuga masakr sendvic',
             'category_id' => $mainCategory->id,
         ]);
@@ -77,6 +82,7 @@ class CategoriesAndProductsSeeder extends Seeder
         $potatoes = Product::firstOrCreate(['slug' => 'grilovane-bramburky'], [
             'title'       => 'Grilovane bramburky',
             'sequence'    => 100,
+            'heat'        => 50,
             'description' => 'Bramburky ve slupce s cesnekovym dipem',
             'category_id' => $sidesCategory->id,
         ]);
@@ -86,6 +92,23 @@ class CategoriesAndProductsSeeder extends Seeder
         ];
 
         $this->createProductVariationsForProduct($potatoesVariations, $potatoes);
+
+        $drinksCategory = Category::ofSlug('piti')->first();
+
+        /** @var Product $potatoes */
+        $beers = Product::firstOrCreate(['slug' => 'pilsner-urquell'], [
+            'title'       => 'Pilsner Urquell',
+            'sequence'    => 100,
+            'heat'        => 10,
+            'description' => 'Nejlepsi lahvac',
+            'category_id' => $drinksCategory->id,
+        ]);
+
+        $beersVariations = [
+            'Jedno pivko' => 45,
+        ];
+
+        $this->createProductVariationsForProduct($beersVariations, $beers);
     }
 
     /**
