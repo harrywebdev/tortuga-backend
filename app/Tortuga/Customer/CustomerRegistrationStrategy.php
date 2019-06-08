@@ -93,7 +93,7 @@ class CustomerRegistrationStrategy
     {
         try {
             /** @var FacebookResponse $response */
-            $response = Facebook::get('/me?fields=id,name,email', $customerData->code);
+            $response = Facebook::get('/me?fields=id,name,email,link', $customerData->code);
             $userNode = $response->getGraphUser();
 
             $customer = Customer::where('facebook_id', '=', $userNode->getId())
@@ -104,11 +104,12 @@ class CustomerRegistrationStrategy
                 return $customer;
             }
 
-            $customer              = new Customer();
-            $customer->reg_type    = 'facebook';
-            $customer->name        = $userNode->getName();
-            $customer->email       = $userNode->getEmail();
-            $customer->facebook_id = $userNode->getId();
+            $customer               = new Customer();
+            $customer->reg_type     = 'facebook';
+            $customer->name         = $userNode->getName();
+            $customer->email        = $userNode->getEmail();
+            $customer->facebook_id  = $userNode->getId();
+            $customer->facebook_url = $userNode->getLink();
 
             $customer->save();
 
