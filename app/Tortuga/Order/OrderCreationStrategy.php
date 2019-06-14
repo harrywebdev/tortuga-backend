@@ -39,7 +39,7 @@ class OrderCreationStrategy
         $order->customer_id     = $orderData->data->relationships->customer->data->id;
         $order->delivery_type   = $orderData->data->attributes->delivery_type;
         $order->payment_type    = $orderData->data->attributes->payment_type;
-        $order->pickup_time     = $orderData->data->attributes->pickup_time;
+        $order->order_time      = $orderData->data->attributes->order_time;
         $order->status          = OrderStatus::INCOMPLETE();
         $order->subtotal_amount = 0;
         $order->total_amount    = 0;

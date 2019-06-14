@@ -20,11 +20,9 @@ class CreateOrdersTable extends Migration
 
             $table->enum('delivery_type', ['pickup', 'delivery'])->default('pickup');
             $table->enum('payment_type', ['cash', 'card'])->default('cash');
-            $table->string('pickup_time', 5)->nullable();
+            $table->string('order_time', 5)->nullable();
 
             $table->enum('status', OrderStatus::keys())->default(OrderStatus::INCOMPLETE());
-            $table->boolean('is_auto_accepted')->default(false);
-            $table->boolean('is_overload')->default(false);
 
             $table->unsignedMediumInteger('total_amount');
             $table->unsignedMediumInteger('subtotal_amount');
@@ -32,8 +30,9 @@ class CreateOrdersTable extends Migration
             $table->unsignedMediumInteger('extra_amount');
             $table->string('currency', 3)->default('CZK');
 
-            $table->boolean('is_touched')->default(false);
-            $table->string('touched_reason')->nullable();
+            $table->boolean('is_delayed')->default(false);
+            $table->boolean('is_changed')->default(false);
+            $table->string('changed_reason')->nullable();
             $table->string('reject_reason')->nullable();
             $table->string('cancelled_reason')->nullable();
 
