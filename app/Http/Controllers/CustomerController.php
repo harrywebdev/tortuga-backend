@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Customer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Tortuga\ApiTransformer\GetCustomersApiTransformer;
 use Tortuga\Validation\AccountKitException;
 use Tortuga\Validation\InvalidDataException;
 use Tortuga\ApiTransformer\GetCustomerApiTransformer;
@@ -14,7 +17,36 @@ class CustomerController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(Request $request)
+    public function index(Request $request)
+    {
+        $accountId = $request->get('account_id');
+        $name      = $request->get('name');
+        $regType   = $request->get('reg_type');
+
+        if (!$accountId || !$name || !$regType) {
+            return $this->_returnError();
+        }
+
+        try {
+            /** @var Customer $customer */
+            $customer = Customer::where('account_kit_id', $accountId)
+                ->where('name', $name)
+                ->where('reg_type', $regType)
+                ->firstOrFail();
+
+            $transformer = new GetCustomersApiTransformer();
+
+            return response()->json($transformer->output([$customer->toArray()]));
+        } catch (ModelNotFoundException $e) {
+            return $this->_returnError();
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
     {
         try {
             /** @var CustomerRegistrationStrategy $strategy */
@@ -25,25 +57,9 @@ class CustomerController extends Controller
 
             return response()->json($transformer->output($customer->toArray()));
         } catch (InvalidDataException $e) {
-            return response()->json((object)['errors' => [(object)[
-                'status' => 422,
-                'source' => (object)['pointer' => $e->getDataPointer()],
-                'title'  => 'JSON Schema Validation error',
-                'detail' => $e->getMessage(),
-            ],]], 400);
+            return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
         } catch (AccountKitException $e) {
-            return response()->json((object)['errors' => [(object)[
-                'status' => 401,
-                'source' => (object)['pointer' => '/data/attributes/code'],
-                'title'  => $e->getMessage(),
-                'detail' => $e->getMessage(),
-            ],]], 400);
-        } catch (\Exception $e) {
-            return response()->json((object)['errors' => [(object)[
-                'status' => 500,
-                'title'  => 'Internal Server Error',
-                'detail' => $e->getMessage(),
-            ],]], 500);
+            return $this->_returnError(401, $e->getMessage(), $e->getMessage(), '/data/attributes/code');
         }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
+use App\Settings;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Tortuga\AppSettings;
 use Tortuga\Validation\JsonSchemaValidator;
-use Tortuga\Validation\LaravelValidator;
-use Tortuga\Validation\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,8 +27,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Tortuga\Validation\JsonSchemaValidator', function ($app) {
+        $this->app->singleton(JsonSchemaValidator::class, function ($app) {
             return new JsonSchemaValidator();
+        });
+
+        $this->app->singleton(AppSettings::class, function () {
+            return new AppSettings(Settings::all()->pluck('value', 'name')->toArray());
         });
     }
 }

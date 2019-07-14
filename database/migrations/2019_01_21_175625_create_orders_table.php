@@ -20,9 +20,9 @@ class CreateOrdersTable extends Migration
 
             $table->enum('delivery_type', ['pickup', 'delivery'])->default('pickup');
             $table->enum('payment_type', ['cash', 'card'])->default('cash');
-            $table->string('order_time', 5)->nullable();
+            $table->dateTime('order_time');
 
-            $table->enum('status', OrderStatus::keys())->default(OrderStatus::INCOMPLETE());
+            $table->enum('status', OrderStatus::values())->default(OrderStatus::INCOMPLETE());
 
             $table->unsignedMediumInteger('total_amount');
             $table->unsignedMediumInteger('subtotal_amount');

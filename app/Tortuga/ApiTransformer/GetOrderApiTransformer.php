@@ -23,6 +23,8 @@ class GetOrderApiTransformer implements ApiTransformer
             ],
         ];
 
+        $output['data']['attributes']['status'] = mb_strtolower($output['data']['attributes']['status']);
+
         return $output;
     }
 }

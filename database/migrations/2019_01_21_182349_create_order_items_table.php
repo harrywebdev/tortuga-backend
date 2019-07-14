@@ -14,6 +14,7 @@ class CreateOrderItemsTable extends Migration
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
+            $table->increments('id');
             $table->unsignedInteger('order_id');
 
             // product title + product variation title

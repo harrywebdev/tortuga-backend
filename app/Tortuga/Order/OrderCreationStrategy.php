@@ -6,7 +6,10 @@ use App\Events\OrderReceived;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
+use Illuminate\Support\Carbon;
+use Tortuga\SlotStrategy;
 use Tortuga\Validation\JsonSchemaValidator;
+use Tortuga\Validation\OrderSlotFullyBookedException;
 
 class OrderCreationStrategy
 {
@@ -16,17 +19,25 @@ class OrderCreationStrategy
     private $validator;
 
     /**
+     * @var SlotStrategy
+     */
+    private $slotStrategy;
+
+    /**
      * CustomerRegistrationStrategy constructor.
      * @param JsonSchemaValidator $validator
+     * @param SlotStrategy        $slotStrategy
      */
-    function __construct(JsonSchemaValidator $validator)
+    function __construct(JsonSchemaValidator $validator, SlotStrategy $slotStrategy)
     {
-        $this->validator = $validator;
+        $this->validator    = $validator;
+        $this->slotStrategy = $slotStrategy;
     }
 
     /**
      * @param object $orderData
      * @return Order
+     * @throws OrderSlotFullyBookedException
      */
     public function createOrder(object $orderData): Order
     {
@@ -35,11 +46,20 @@ class OrderCreationStrategy
             'http://localhost/create_order.json'
         );
 
-        $order                  = new Order();
-        $order->customer_id     = $orderData->data->relationships->customer->data->id;
-        $order->delivery_type   = $orderData->data->attributes->delivery_type;
-        $order->payment_type    = $orderData->data->attributes->payment_type;
-        $order->order_time      = $orderData->data->attributes->order_time;
+        $orderTime = $this->slotStrategy->createOrderTimeFromShortString($orderData->data->attributes->order_time);
+
+        // check if desired slot is available
+        if (!$this->slotStrategy->isSlotAvailable($orderTime)) {
+            throw new OrderSlotFullyBookedException();
+        }
+
+        $order                = new Order();
+        $order->customer_id   = $orderData->data->relationships->customer->data->id;
+        $order->delivery_type = $orderData->data->attributes->delivery_type;
+        $order->payment_type  = $orderData->data->attributes->payment_type;
+
+        $order->order_time      = $orderTime;
+        $order->is_takeaway     = $orderData->data->attributes->is_takeaway;
         $order->status          = OrderStatus::INCOMPLETE();
         $order->subtotal_amount = 0;
         $order->total_amount    = 0;

@@ -25,7 +25,8 @@
           "required": [
             "delivery_type",
             "payment_type",
-            "order_time"
+            "order_time",
+            "is_takeaway"
           ],
           "additionalProperties": true,
           "properties": {
@@ -47,7 +48,10 @@
             },
             "order_time": {
               "type": "string",
-              "pattern": "^[0-9]{2}:[0-9]{2}$"
+              "pattern": "^([01][0-9]|2[0-3]):(00|30)$"
+            },
+            "is_takeaway": {
+              "type": "boolean"
             }
           }
         },

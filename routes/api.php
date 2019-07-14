@@ -5,6 +5,7 @@ use App\Product;
 use Illuminate\Http\Request;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
 use Tortuga\ApiTransformer\GetProductsApiTransformer;
+use Tortuga\ApiTransformer\GetSlotsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,8 +36,23 @@ Route::get('/products', function (Request $request) {
     return response()->json($transformer->output($products));
 });
 
-Route::post('/customers', 'CustomerController@create');
-Route::post('/orders', 'OrderController@create');
+Route::get('/slots', function (Request $request) {
+    /** @var \Tortuga\SlotStrategy $strategy */
+    $strategy = app()->make(\Tortuga\SlotStrategy::class);
+    $slots    = $strategy->getAvailableSlots();
+
+    $transformer = new GetSlotsApiTransformer();
+
+    return response()->json($transformer->output($slots));
+});
+
+Route::resource('/customers', 'CustomerController')->only([
+    'index', 'store',
+]);
+
+Route::resource('/orders', 'OrderController')->only([
+    'index', 'store', 'update',
+]);
 
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);

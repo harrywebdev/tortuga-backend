@@ -58,7 +58,7 @@ class OrderStatus extends Enum
      * Picked up and completed.
      * Makes the Treasury
      */
-    private const COMPLETE = 'complete';
+    private const COMPLETED = 'completed';
 
     /**
      * Something bad happened since the acceptance and

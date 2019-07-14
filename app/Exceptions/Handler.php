@@ -46,6 +46,21 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($request->wantsJson()) {
+            $status = 500;
+
+            if ($this->isHttpException($exception)) {
+                $status = $exception->getStatusCode();
+            }
+
+            return response()->json((object)['errors' => [(object)[
+                'status' => $status,
+                'source' => (object)['pointer' => '/'],
+                'title'  => 'Internal Server Error',
+                'detail' => $exception->getMessage(),
+            ],]], $status);
+        }
+
         return parent::render($request, $exception);
     }
 

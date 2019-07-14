@@ -11,13 +11,14 @@
     "php": "^7.1.3",
     "barryvdh/laravel-cors": "^0.11.3",
     "fideloper/proxy": "^4.0",
-    "laravel/framework": "5.7.*",
+    "laravel/framework": "5.8.*",
     "laravel/tinker": "^1.0",
     "myclabs/php-enum": "^1.7",
     "opis/json-schema": "^1.0",
     "pusher/pusher-php-server": "~3.0",
     "sammyk/laravel-facebook-sdk": "^3.5",
-    "tayokin/laravel-facebook-accountkit": "^1.0"
+    "tayokin/laravel-facebook-accountkit": "^1.0",
+    "gpaddis/timeslot": "dev-master"
   },
   "require-dev": {
     "beyondcode/laravel-dump-server": "^1.0",
@@ -27,6 +28,12 @@
     "nunomaduro/collision": "^2.0",
     "phpunit/phpunit": "^7.0"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/harrywebdev/timeslot"
+    }
+  ],
   "config": {
     "optimize-autoloader": true,
     "preferred-install": "dist",
