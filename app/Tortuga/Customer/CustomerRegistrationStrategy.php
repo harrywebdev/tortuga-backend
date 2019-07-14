@@ -62,6 +62,11 @@ class CustomerRegistrationStrategy
                 ->first();
 
             if ($customer) {
+                // update name if exists
+                if ($customerData->name && $customer->name !== $customerData->name) {
+                    $customer->name = $customerData->name;
+                    $customer->save();
+                }
                 return $customer;
             }
 
@@ -71,6 +76,10 @@ class CustomerRegistrationStrategy
             $customer->mobile_country_prefix  = $accountData->phone->country_prefix;
             $customer->mobile_national_number = $accountData->phone->national_number;
             $customer->account_kit_id         = $accountData->id;
+
+            if ($customerData->name) {
+                $customer->name = $customerData->name;
+            }
 
             $customer->save();
 

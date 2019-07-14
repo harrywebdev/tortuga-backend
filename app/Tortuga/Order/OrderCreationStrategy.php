@@ -68,15 +68,6 @@ class OrderCreationStrategy
         $order->status          = OrderStatus::RECEIVED();
         $order->save();
 
-        // also update Customer
-        try {
-            $order->customer->name = $orderData->data->relationships->customer->data->attributes->name;
-            $order->customer->save();
-        } catch (\Exception $e) {
-            // it's not critical so just report to tracker
-            // TODO: error reporting to like honeybadger
-        }
-
         event(new OrderReceived($order));
 
         return $order;

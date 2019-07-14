@@ -54,10 +54,9 @@
         "relationships": {
           "type": "object",
           "required": [
-            "items",
-            "customer"
+            "items"
           ],
-          "additionalProperties": false,
+          "additionalProperties": true,
           "properties": {
             "items": {
               "type": "object",
@@ -75,9 +74,6 @@
                   }
                 }
               }
-            },
-            "customer": {
-              "$ref": "http://localhost/update_customer.json#"
             }
           }
         }
