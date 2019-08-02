@@ -30,4 +30,12 @@ class AppSettings
 
         return $this->settings[$key];
     }
+
+    /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->settings;
+    }
 }
