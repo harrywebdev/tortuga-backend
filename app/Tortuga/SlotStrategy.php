@@ -70,6 +70,10 @@ class SlotStrategy
      */
     private function _getOpeningHoursSlots(): TimeslotCollection
     {
+        if (!$this->settings->get(SettingsName::IS_OPEN_FOR_BOOKING())) {
+            throw new \Exception('Shop is closed - no slots.');
+        }
+
         // midnight - 3am still counts as previous day
         $dayOfWeek = (Carbon::now()->hour <= 3 ? Carbon::yesterday() : Carbon::now())->dayOfWeekIso;
         $hourSlots = [];

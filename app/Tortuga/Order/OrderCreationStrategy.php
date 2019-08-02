@@ -6,7 +6,7 @@ use App\Events\OrderReceived;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
-use Illuminate\Support\Carbon;
+use Tortuga\AppSettings;
 use Tortuga\SlotStrategy;
 use Tortuga\Validation\JsonSchemaValidator;
 use Tortuga\Validation\OrderSlotFullyBookedException;
@@ -24,14 +24,21 @@ class OrderCreationStrategy
     private $slotStrategy;
 
     /**
+     * @var AppSettings
+     */
+    private $settings;
+
+    /**
      * CustomerRegistrationStrategy constructor.
      * @param JsonSchemaValidator $validator
      * @param SlotStrategy        $slotStrategy
+     * @param AppSettings         $settings
      */
-    function __construct(JsonSchemaValidator $validator, SlotStrategy $slotStrategy)
+    function __construct(JsonSchemaValidator $validator, SlotStrategy $slotStrategy, AppSettings $settings)
     {
         $this->validator    = $validator;
         $this->slotStrategy = $slotStrategy;
+        $this->settings     = $settings;
     }
 
     /**
