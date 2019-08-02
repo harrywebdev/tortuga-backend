@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Order;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Tortuga\ApiTransformer\GetOrderApiTransformer;
 use Tortuga\ApiTransformer\GetOrdersApiTransformer;
@@ -88,8 +89,15 @@ class OrderController extends Controller
                 'http://localhost/update_order.json'
             );
 
+            // update status
             if ($data->data->attributes->status !== $order->status) {
                 $order->status = new OrderStatus($data->data->attributes->status);
+            }
+
+            // update order time
+            $orderTime = new Carbon($data->data->attributes->order_time);
+            if ($orderTime != $order->order_time) {
+                $order->order_time = $orderTime;
             }
 
             $order->save();

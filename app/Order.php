@@ -16,7 +16,7 @@ class Order extends Model
      * @var array
      */
     protected $casts = [
-        'order_time'  => 'datetime:Y-m-d H:i:s',
+        'order_time'  => 'datetime:Y-m-d\TH:i:s',
         'is_takeaway' => 'boolean',
     ];
 
