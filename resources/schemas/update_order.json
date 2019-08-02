@@ -22,9 +22,6 @@
         },
         "attributes": {
           "type": "object",
-          "required": [
-            "status"
-          ],
           "additionalProperties": true,
           "properties": {
             "status": {
@@ -36,6 +33,10 @@
                 "made",
                 "completed"
               ]
+            },
+            "order_time": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         },
