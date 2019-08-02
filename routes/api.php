@@ -5,7 +5,6 @@ use App\Product;
 use Illuminate\Http\Request;
 use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
 use Tortuga\ApiTransformer\GetProductsApiTransformer;
-use Tortuga\ApiTransformer\GetSettingsApiTransformer;
 use Tortuga\ApiTransformer\GetSlotsApiTransformer;
 
 /*
@@ -47,21 +46,16 @@ Route::get('/slots', function (Request $request) {
     return response()->json($transformer->output($slots));
 });
 
-Route::get('/settings/{id}', function (Request $request) {
-    /** @var \Tortuga\AppSettings $settings */
-    $settings = app()->make(\Tortuga\AppSettings::class);
-
-    $transformer = new GetSettingsApiTransformer();
-
-    return response()->json($transformer->output($settings->all()));
-});
-
 Route::resource('/customers', 'CustomerController')->only([
     'index', 'store',
 ]);
 
 Route::resource('/orders', 'OrderController')->only([
     'index', 'store', 'update',
+]);
+
+Route::resource('/settings', 'SettingsController')->only([
+    'update', 'show',
 ]);
 
 Route::fallback(function () {
