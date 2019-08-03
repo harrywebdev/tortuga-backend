@@ -174,6 +174,7 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\CursorPaginationServiceProvider::class,
 
         Tayokin\FacebookAccountKit\FacebookAccountKitServiceProvider::class,
         SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,

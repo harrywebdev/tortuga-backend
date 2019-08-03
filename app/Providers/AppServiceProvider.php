@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Settings;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Tortuga\AppSettings;
@@ -21,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
 
         // TODO: locale configurable
         setlocale(LC_MONETARY, 'cs_CZ');
+
+        if (env('APP_ENV') === 'local') {
+            DB::connection()->enableQueryLog();
+            // for printing all queries that ran, use this:
+            // dd(\Illuminate\Support\Facades\DB::getQueryLog());
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Resources\OrderCollection;
 use App\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Tortuga\CursorPaginator;
 use Tortuga\Order\OrderCreationStrategy;
 use Tortuga\Order\OrderStatus;
 use Tortuga\Validation\InvalidDataException;
@@ -60,15 +61,27 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: add $queryParam for asc/desc and pagination
         $builder = Order::with(['items', 'customer'])
-            ->where('status', '<>', 'incomplete')
-            ->orderedByTime()
-            ->fromNow();
+            ->where('status', '<>', 'incomplete');
 
-        $orders = $builder->get();
+        $limit = $request->get('limit', 5);
 
-        return new OrderCollection($orders);
+        // first load - from now
+        if (!request('before') && !request('after')) {
+            $builder = $builder->fromNow();
+        }
+
+        // default is AFTER with  no cursor set
+        // see the builder macro in CursorPaginationServiceProvider::class
+        $direction = request('before') ? 'desc' : 'asc';
+
+        /** @var CursorPaginator $orders */
+        $orders = $builder->cursorPaginate($limit, [
+            'order_time' => $direction,
+            'id'         => $direction,
+        ])->appends(['limit' => $limit]);
+
+        return new OrderCollection($orders->items(), $orders);
     }
 
     /**

@@ -4,9 +4,26 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
+use Tortuga\CursorPaginator;
 
 class OrderCollection extends ResourceCollection
 {
+    /**
+     * @var null
+     */
+    private $paginator;
+
+    /**
+     * OrderCollection constructor.
+     * @param mixed                $resource
+     * @param CursorPaginator|null $paginator
+     */
+    public function __construct($resource, $paginator = null)
+    {
+        parent::__construct($resource);
+        $this->paginator = $paginator;
+    }
+
     /**
      * Transform the resource collection into an array.
      *
@@ -21,6 +38,11 @@ class OrderCollection extends ResourceCollection
                 'self' => env('APP_URL') . '/api/orders',
             ],
         ];
+
+        // add correct self params
+        if (count($request->all())) {
+            $data['links']['self'] .= '?' . http_build_query($request->all());
+        }
 
         // add included data
         // * Customer (always)
@@ -40,6 +62,11 @@ class OrderCollection extends ResourceCollection
         }
 
         $data['included'] = $data['included']->unique()->values();
+
+        if ($this->paginator) {
+            $data['links']['next'] = $this->paginator->nextCursorUrl(env('APP_URL') . '/api/orders');
+            $data['links']['prev'] = $this->paginator->prevCursorUrl(env('APP_URL') . '/api/orders');
+        }
 
         return $data;
     }
