@@ -94,6 +94,10 @@ class SlotStrategy
             case 5:
                 $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
                 break;
+            // Sa
+            case 6:
+                $hourSlots = [18, 19, 20, 21, 22, 23];
+                break;
         }
 
         // build all the slots
