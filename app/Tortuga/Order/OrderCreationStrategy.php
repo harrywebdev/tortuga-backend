@@ -6,6 +6,7 @@ use App\Events\OrderReceived;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
+use Illuminate\Support\Facades\Log;
 use Tortuga\AppSettings;
 use Tortuga\SlotStrategy;
 use Tortuga\Validation\JsonSchemaValidator;
@@ -95,7 +96,11 @@ class OrderCreationStrategy
         $order->status          = OrderStatus::RECEIVED();
         $order->save();
 
-        event(new OrderReceived($order));
+        try {
+            event(new OrderReceived($order));
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
 
         return $order;
     }

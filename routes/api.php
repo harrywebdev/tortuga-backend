@@ -3,9 +3,6 @@
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\GetCategoriesApiTransformer;
-use Tortuga\ApiTransformer\GetProductsApiTransformer;
-use Tortuga\ApiTransformer\GetSlotsApiTransformer;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,17 +20,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/categories', function (Request $request) {
-    $categories  = Category::has('products')->ordered()->get()->toArray();
-    $transformer = new GetCategoriesApiTransformer();
+    $categories = Category::has('products')->ordered()->get();
 
-    return response()->json($transformer->output($categories));
+    return new \App\Http\Resources\CategoryCollection($categories);
 });
 
 Route::get('/products', function (Request $request) {
-    $products    = Product::with('variations')->ordered()->get()->toArray();
-    $transformer = new GetProductsApiTransformer();
+    $products = Product::with('variations')->ordered()->get();
 
-    return response()->json($transformer->output($products));
+    return new \App\Http\Resources\ProductCollection($products);
 });
 
 Route::get('/slots', function (Request $request) {
@@ -41,9 +36,7 @@ Route::get('/slots', function (Request $request) {
     $strategy = app()->make(\Tortuga\SlotStrategy::class);
     $slots    = $strategy->getAvailableSlots();
 
-    $transformer = new GetSlotsApiTransformer();
-
-    return response()->json($transformer->output($slots));
+    return new \App\Http\Resources\SlotCollection($slots);
 });
 
 Route::resource('/customers', 'CustomerController')->only([

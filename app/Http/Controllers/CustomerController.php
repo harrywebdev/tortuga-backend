@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\Http\Resources\CustomerCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\GetCustomersApiTransformer;
+use Illuminate\Support\Collection;
 use Tortuga\Validation\AccountKitException;
 use Tortuga\Validation\InvalidDataException;
-use Tortuga\ApiTransformer\GetCustomerApiTransformer;
 use Tortuga\Customer\CustomerRegistrationStrategy;
+use App\Http\Resources\Customer as CustomerResource;
 
 class CustomerController extends Controller
 {
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return CustomerCollection|\Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
@@ -34,9 +35,7 @@ class CustomerController extends Controller
                 ->where('reg_type', $regType)
                 ->firstOrFail();
 
-            $transformer = new GetCustomersApiTransformer();
-
-            return response()->json($transformer->output([$customer->toArray()]));
+            return new CustomerCollection(new Collection([$customer]));
         } catch (ModelNotFoundException $e) {
             return $this->_returnError();
         }
@@ -44,18 +43,16 @@ class CustomerController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return CustomerResource|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         try {
             /** @var CustomerRegistrationStrategy $strategy */
             $strategy = app()->make(CustomerRegistrationStrategy::class);
+            $customer = $strategy->registerCustomer(json_decode($request->getContent()));
 
-            $customer    = $strategy->registerCustomer(json_decode($request->getContent()));
-            $transformer = new GetCustomerApiTransformer();
-
-            return response()->json($transformer->output($customer->toArray()));
+            return new CustomerResource($customer);
         } catch (InvalidDataException $e) {
             return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
         } catch (AccountKitException $e) {

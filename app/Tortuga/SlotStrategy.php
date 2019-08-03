@@ -4,6 +4,7 @@ namespace Tortuga;
 
 use App\Order;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Timeslot\Timeslot;
 use Timeslot\TimeslotCollection;
@@ -26,14 +27,14 @@ class SlotStrategy
     }
 
     /**
-     * @return array
+     * @return Collection
      */
-    public function getAvailableSlots(): array
+    public function getAvailableSlots(): Collection
     {
         try {
             $openingHoursSlots = $this->_getOpeningHoursSlots();
         } catch (\Exception $e) {
-            return [];
+            return Collection::make([]);
         }
 
         // get counts in the slots range and check number of orders
@@ -46,14 +47,15 @@ class SlotStrategy
             ->groupBy('order_time')
             ->pluck('count', 'order_time');
 
-        $availableSlots = [];
+        $availableSlots = Collection::make([]);
         foreach ($openingHoursSlots as $slot) {
             $slotString = $slot->start()->toDateTimeString();
 
+            // check if slo is free (zero or less than max orders in the slot)
             if (!isset($ordersBySlots[$slotString]) ||
                 $ordersBySlots[$slotString] < $this->settings->get(SettingsName::MAX_ORDERS_PER_SLOT())
             ) {
-                array_push($availableSlots, [
+                $availableSlots->add([
                     'id'       => $slot->start()->timestamp,
                     'datetime' => $slotString,
                     'slot'     => $slot->start()->format('H:i'),

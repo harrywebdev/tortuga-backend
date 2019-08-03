@@ -39,6 +39,22 @@ class ProductVariation extends Model
     }
 
     /**
+     * @return string
+     */
+    public function getPriceFormattedAttribute()
+    {
+        return money_format('%.0n', $this->price / 100);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencyFormattedAttribute()
+    {
+        return localeconv()['currency_symbol'];
+    }
+
+    /**
      * @param Builder $query
      * @return Builder
      */

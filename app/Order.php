@@ -42,6 +42,14 @@ class Order extends Model
     }
 
     /**
+     * @return string
+     */
+    public function getTotalAmountFormattedAttribute()
+    {
+        return money_format('%.0n', $this->total_amount / 100);
+    }
+
+    /**
      * @param Builder $query
      * @return Builder
      */

@@ -5,16 +5,10 @@ namespace App\Http\Controllers;
 use App\Order;
 use App\Settings;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\GetOrderApiTransformer;
-use Tortuga\ApiTransformer\GetOrdersApiTransformer;
-use Tortuga\ApiTransformer\GetSettingsApiTransformer;
-use Tortuga\AppSettings;
-use Tortuga\Order\OrderCreationStrategy;
-use Tortuga\Order\OrderStatus;
 use Tortuga\SettingsName;
 use Tortuga\Validation\InvalidDataException;
 use Tortuga\Validation\JsonSchemaValidator;
-use Tortuga\Validation\OrderSlotFullyBookedException;
+use App\Http\Resources\Settings as SettingsResource;
 
 class SettingsController extends Controller
 {
@@ -34,24 +28,26 @@ class SettingsController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return SettingsResource
      */
-    public function show(Request $request)
+    public function show(Request $request, $id)
     {
         /** @var \Tortuga\AppSettings $settings */
         $settings = app()->make(\Tortuga\AppSettings::class);
+        $settings = $settings->all();
 
-        $transformer = new GetSettingsApiTransformer();
+        // HACK: add this for our resource
+        $settings['id'] = $id;
 
-        return response()->json($transformer->output($settings->all()));
+        return new SettingsResource($settings);
     }
 
     /**
      * @param Order   $order
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return SettingsResource|\Illuminate\Http\JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         try {
             $data = json_decode($request->getContent());
@@ -72,10 +68,12 @@ class SettingsController extends Controller
 
             /** @var \Tortuga\AppSettings $settings */
             $settings = app()->make(\Tortuga\AppSettings::class);
+            $settings = $settings->all();
 
-            $transformer = new GetSettingsApiTransformer();
+            // HACK: add this for our resource
+            $settings['id'] = $id;
 
-            return response()->json($transformer->output($settings->all()));
+            return new SettingsResource($settings);
         } catch (InvalidDataException $e) {
             return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
         }

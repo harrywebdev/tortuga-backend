@@ -11,14 +11,13 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Tortuga\ApiTransformer\GetOrderApiTransformer;
 
 class OrderReceived implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var array
+     * @var \App\Http\Resources\Order
      */
     private $order;
 
@@ -29,8 +28,7 @@ class OrderReceived implements ShouldBroadcast
      */
     public function __construct(Order $order)
     {
-        $transformer = new GetOrderApiTransformer();
-        $this->order = $transformer->output($order->toArray());
+        $this->order = new \App\Http\Resources\Order($order);
     }
 
     /**
@@ -60,6 +58,6 @@ class OrderReceived implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        return $this->order;
+        return $this->order->jsonSerialize();
     }
 }

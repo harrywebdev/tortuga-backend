@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderCollection;
 use App\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Tortuga\ApiTransformer\GetOrderApiTransformer;
-use Tortuga\ApiTransformer\GetOrdersApiTransformer;
 use Tortuga\Order\OrderCreationStrategy;
 use Tortuga\Order\OrderStatus;
 use Tortuga\Validation\InvalidDataException;
 use Tortuga\Validation\JsonSchemaValidator;
 use Tortuga\Validation\OrderSlotFullyBookedException;
+use App\Http\Resources\Order as OrderResource;
 
 class OrderController extends Controller
 {
@@ -31,7 +31,7 @@ class OrderController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderResource|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -39,10 +39,9 @@ class OrderController extends Controller
             /** @var OrderCreationStrategy $strategy */
             $strategy = app()->make(OrderCreationStrategy::class);
 
-            $order       = $strategy->createOrder(json_decode($request->getContent()));
-            $transformer = new GetOrderApiTransformer();
+            $order = $strategy->createOrder(json_decode($request->getContent()));
 
-            return response()->json($transformer->output($order->toArray()));
+            return new OrderResource($order);
         } catch (InvalidDataException $e) {
             return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
         } catch (OrderSlotFullyBookedException $e) {
@@ -57,7 +56,7 @@ class OrderController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderCollection
      */
     public function index(Request $request)
     {
@@ -67,22 +66,19 @@ class OrderController extends Controller
             ->orderedByTime()
             ->fromNow();
 
-        $orders      = $builder->paginate(10)->toArray();
-        $transformer = new GetOrdersApiTransformer();
+        $orders = $builder->get();
 
-        return response()->json($transformer->output($orders['data']));
+        return new OrderCollection($orders);
     }
 
     /**
      * @param Order   $order
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderResource|\Illuminate\Http\JsonResponse
      */
     public function update(Order $order, Request $request)
     {
         try {
-            $transformer = new GetOrderApiTransformer();
-
             $data = json_decode($request->getContent());
             $this->validator->validate(
                 $data,
@@ -102,7 +98,7 @@ class OrderController extends Controller
 
             $order->save();
 
-            return response()->json($transformer->output($order->toArray()));
+            return new OrderResource($order);
         } catch (InvalidDataException $e) {
             return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
         }
