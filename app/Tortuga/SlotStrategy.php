@@ -102,6 +102,11 @@ class SlotStrategy
                 break;
         }
 
+        // testing stuff
+        if (env('APP_ENV') === 'local') {
+            $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
+        }
+
         // build all the slots
         $hourSlots = array_reduce($hourSlots, function ($acc, $item) {
             $carbon = Carbon::createFromTime($item, 0, 0);
