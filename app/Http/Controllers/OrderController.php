@@ -109,6 +109,14 @@ class OrderController extends Controller
                 $order->order_time = $orderTime;
             }
 
+            // update basic keys
+            $basicKeys = ['rejected_reason', 'cancelled_reason'];
+            foreach ($basicKeys as $key) {
+                if ($data->data->attributes->{$key}) {
+                    $order->{$key} = $data->data->attributes->{$key};
+                }
+            }
+
             $order->save();
 
             return new OrderResource($order);

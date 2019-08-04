@@ -37,6 +37,20 @@
             "order_time": {
               "type": "string",
               "format": "date-time"
+            },
+            "reject_reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 191
+            },
+            "cancel_reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 191
             }
           }
         },

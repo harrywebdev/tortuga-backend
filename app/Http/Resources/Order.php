@@ -31,7 +31,7 @@ class Order extends JsonResource
                 'is_delayed'             => $this->is_delayed,
                 'is_changed'             => $this->is_changed,
                 'changed_reason'         => $this->changed_reason,
-                'reject_reason'          => $this->reject_reason,
+                'rejected_reason'        => $this->rejected_reason,
                 'cancelled_reason'       => $this->cancelled_reason,
                 'created_at'             => $this->created_at,
                 'updated_at'             => $this->updated_at,
