@@ -15,8 +15,8 @@ class SettingsSeeder extends Seeder
 
         $settings = [];
 
-        $settings[SettingsName::IS_OPEN_FOR_BOOKING()] = 1;
-        $settings[SettingsName::MAX_ORDERS_PER_SLOT()] = 3;
+        $settings[(string)SettingsName::IS_OPEN_FOR_BOOKING()] = 1;
+        $settings[(string)SettingsName::MAX_ORDERS_PER_SLOT()] = 3;
 
         foreach ($settings as $name => $value) {
             if (!\App\Settings::where('name', '=', $name)->count()) {
