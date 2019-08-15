@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // TODO: locale configurable
         setlocale(LC_MONETARY, 'cs_CZ');
 
-        if (env('APP_ENV') === 'local') {
+        if (config('app.env') === 'local') {
             DB::connection()->enableQueryLog();
             // for printing all queries that ran, use this:
             // dd(\Illuminate\Support\Facades\DB::getQueryLog());

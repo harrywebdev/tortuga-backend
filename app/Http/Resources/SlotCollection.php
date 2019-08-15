@@ -17,7 +17,7 @@ class SlotCollection extends ResourceCollection
         return [
             'data'  => $this->collection,
             'links' => [
-                'self' => env('APP_URL') . '/api/slots',
+                'self' => config('app.url') . '/api/slots',
             ],
         ];
     }

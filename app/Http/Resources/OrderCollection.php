@@ -35,7 +35,7 @@ class OrderCollection extends ResourceCollection
         $data = [
             'data'  => $this->collection,
             'links' => [
-                'self' => env('APP_URL') . '/api/orders',
+                'self' => config('app.url') . '/api/orders',
             ],
         ];
 
@@ -64,8 +64,8 @@ class OrderCollection extends ResourceCollection
         $data['included'] = $data['included']->unique()->values();
 
         if ($this->paginator) {
-            $data['links']['next'] = $this->paginator->nextCursorUrl(env('APP_URL') . '/api/orders');
-            $data['links']['prev'] = $this->paginator->prevCursorUrl(env('APP_URL') . '/api/orders');
+            $data['links']['next'] = $this->paginator->nextCursorUrl(config('app.url') . '/api/orders');
+            $data['links']['prev'] = $this->paginator->prevCursorUrl(config('app.url') . '/api/orders');
         }
 
         return $data;

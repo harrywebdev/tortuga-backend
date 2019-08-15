@@ -103,7 +103,7 @@ class SlotStrategy
         }
 
         // testing stuff
-        if (env('APP_ENV') === 'local') {
+        if (config('app.env') === 'local') {
             $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
         }
 

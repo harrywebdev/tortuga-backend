@@ -18,7 +18,7 @@ class ProductCollection extends ResourceCollection
         $data = [
             'data'  => $this->collection,
             'links' => [
-                'self' => env('APP_URL') . '/api/products',
+                'self' => config('app.url') . '/api/products',
             ],
         ];
 

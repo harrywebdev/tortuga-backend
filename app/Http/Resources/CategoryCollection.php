@@ -17,7 +17,7 @@ class CategoryCollection extends ResourceCollection
         return [
             'data'  => $this->collection,
             'links' => [
-                'self' => env('APP_URL') . '/api/categories',
+                'self' => config('app.url') . '/api/categories',
             ],
         ];
     }
