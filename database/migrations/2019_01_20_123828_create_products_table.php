@@ -25,7 +25,7 @@ class CreateProductsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique('slug');
+            $table->unique(['slug', 'deleted_at']);
             $table->foreign('category_id')->references('id')->on('categories');
         });
     }

@@ -29,7 +29,7 @@ class CreateCustomersTable extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(['email', 'mobile_number']);
+            $table->unique(['email', 'mobile_number', 'deleted_at']);
         });
     }
 

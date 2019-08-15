@@ -30,7 +30,7 @@ class CreateProductVariationsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique('slug');
+            $table->unique(['slug', 'deleted_at']);
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('parent_id')->references('id')->on('product_variations');
         });

@@ -1,9 +1,24 @@
 ## Tortuga Backend
 
-### Terminology
+### Deployment
 
-##### Product Heat 
-Value (e.g. range of 0 - 1000) determines how much resources that product takes up being produced
- 
-##### Customer Reputation
-Textual representation of Customer Score calculated based on their history (or lack of).
+Deploys current branch to `api.tatrgel.cz`
+
+```
+php artisan deploy
+```
+
+### Development - initial setup / reset
+
+```
+php artisan migrate:refresh
+php artisan db:seed
+php artisan tortuga:import:products
+```
+
+Eventually can also create fake customers and orders
+
+```
+php artisan db:seed --class=CustomersSeeder
+php artisan db:seed --class=OrdersSeeder
+```
