@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         // TODO: locale configurable
-        setlocale(LC_MONETARY, 'cs_CZ');
+        setlocale(LC_MONETARY, 'cs_CZ.UTF-8');
 
         if (config('app.env') === 'local') {
             DB::connection()->enableQueryLog();
