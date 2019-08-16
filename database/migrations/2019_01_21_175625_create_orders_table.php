@@ -33,7 +33,7 @@ class CreateOrdersTable extends Migration
             $table->boolean('is_delayed')->default(false);
             $table->boolean('is_changed')->default(false);
             $table->string('changed_reason')->nullable();
-            $table->string('reject_reason')->nullable();
+            $table->string('rejected_reason')->nullable();
             $table->string('cancelled_reason')->nullable();
 
             $table->timestamps();

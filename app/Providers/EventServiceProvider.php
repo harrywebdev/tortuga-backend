@@ -18,6 +18,30 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        \App\Events\CustomerRegistered::class => [
+            \App\Listeners\LogCustomerRegistered::class,
+        ],
+
+        \App\Events\CustomerUpdated::class => [
+            \App\Listeners\LogCustomerUpdated::class,
+        ],
+
+        \App\Events\OrderReceived::class => [
+            \App\Listeners\LogOrderCreated::class,
+        ],
+
+        \App\Events\OrderMarkedAsReadyForPickup::class => [
+            \App\Listeners\NotifyCustomerAboutOrderReady::class,
+        ],
+
+        \App\Events\OrderRejected::class => [
+            \App\Listeners\NotifyCustomerAboutOrderRejected::class,
+        ],
+
+        \App\Events\OrderDelayed::class => [
+            \App\Listeners\NotifyCustomerAboutOrderDelayed::class,
+        ],
     ];
 
     /**

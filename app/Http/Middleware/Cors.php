@@ -15,7 +15,9 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
-        $origin = env('APP_ENV') === 'local' ? '*' : env('TORTUGA_CLIENT_URL');
+        // TODO: list of allowed domains
+//        $origin = env('APP_ENV') === 'local' ? '*' : env('TORTUGA_CLIENT_URL');
+        $origin = '*';
 
         return $next($request)
             ->header('Access-Control-Allow-Origin', $origin)

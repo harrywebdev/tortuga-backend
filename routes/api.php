@@ -51,6 +51,16 @@ Route::resource('/settings', 'SettingsController')->only([
     'update', 'show',
 ]);
 
+Route::post('/replies', function (Request $request) {
+    $data = json_decode($request->getContent(), true);
+
+    if (count($data)) {
+        \App\Jobs\ProcessCustomerReplies::dispatch($data);
+    }
+
+    return response()->json(['success' => true]);
+});
+
 Route::fallback(function () {
     return response()->json(['errors' => ['Not Found.']], 404);
 })->name('api.fallback.404');

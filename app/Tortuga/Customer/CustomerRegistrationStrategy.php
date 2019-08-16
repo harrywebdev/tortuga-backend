@@ -3,8 +3,11 @@
 namespace Tortuga\Customer;
 
 use App\Customer;
+use App\Events\CustomerRegistered;
+use App\Events\CustomerUpdated;
 use Facebook\FacebookResponse;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Log;
 use SammyK\LaravelFacebookSdk\FacebookFacade as Facebook;
 use Tayokin\FacebookAccountKit\Facades\FacebookAccountKitFacade;
 use Tortuga\Validation\AccountKitException;
@@ -64,8 +67,12 @@ class CustomerRegistrationStrategy
             if ($customer) {
                 // update name if exists
                 if ($customerData->name && $customer->name !== $customerData->name) {
+                    $oldCustomer = (object)$customer->toArray();
+
                     $customer->name = $customerData->name;
                     $customer->save();
+
+                    event(new CustomerUpdated($customer, $oldCustomer));
                 }
                 return $customer;
             }
@@ -82,6 +89,8 @@ class CustomerRegistrationStrategy
             }
 
             $customer->save();
+
+            event(new CustomerRegistered($customer));
 
             return $customer;
         } catch (ClientException $e) {

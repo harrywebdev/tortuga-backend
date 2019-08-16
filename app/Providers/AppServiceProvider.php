@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // TODO: locale configurable
         setlocale(LC_MONETARY, 'cs_CZ.UTF-8');
 
-        if (config('app.env') === 'local') {
+        if (config('tortuga.debug_db')) {
             DB::connection()->enableQueryLog();
             // for printing all queries that ran, use this:
             // dd(\Illuminate\Support\Facades\DB::getQueryLog());

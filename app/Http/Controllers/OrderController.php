@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderCollection;
 use App\Order;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Tortuga\CursorPaginator;
-use Tortuga\Order\OrderCreationStrategy;
-use Tortuga\Order\OrderStatus;
+use Tortuga\Order\CreateOrderStrategy;
+use Tortuga\Order\UpdateOrderStrategy;
 use Tortuga\Validation\InvalidDataException;
 use Tortuga\Validation\JsonSchemaValidator;
 use Tortuga\Validation\OrderSlotFullyBookedException;
@@ -37,8 +36,8 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         try {
-            /** @var OrderCreationStrategy $strategy */
-            $strategy = app()->make(OrderCreationStrategy::class);
+            /** @var CreateOrderStrategy $strategy */
+            $strategy = app()->make(CreateOrderStrategy::class);
 
             $order = $strategy->createOrder(json_decode($request->getContent()));
 
@@ -92,36 +91,21 @@ class OrderController extends Controller
     public function update(Order $order, Request $request)
     {
         try {
-            $data = json_decode($request->getContent());
-            $this->validator->validate(
-                $data,
-                'http://localhost/update_order.json'
-            );
+            /** @var UpdateOrderStrategy $strategy */
+            $strategy = app()->make(UpdateOrderStrategy::class);
 
-            // update status
-            if ($data->data->attributes->status !== $order->status) {
-                $order->status = new OrderStatus($data->data->attributes->status);
-            }
-
-            // update order time
-            $orderTime = new Carbon($data->data->attributes->order_time);
-            if ($orderTime != $order->order_time) {
-                $order->order_time = $orderTime;
-            }
-
-            // update basic keys
-            $basicKeys = ['rejected_reason', 'cancelled_reason'];
-            foreach ($basicKeys as $key) {
-                if ($data->data->attributes->{$key}) {
-                    $order->{$key} = $data->data->attributes->{$key};
-                }
-            }
-
-            $order->save();
+            $order = $strategy->updateOrder($order, json_decode($request->getContent()));
 
             return new OrderResource($order);
         } catch (InvalidDataException $e) {
             return $this->_returnError(422, 'JSON Schema Validation error', $e->getMessage(), $e->getDataPointer());
+        } catch (OrderSlotFullyBookedException $e) {
+            return $this->_returnError(
+                409,
+                'Order Time unacceptable.',
+                'Selected Order Time is fully booked. Please, choose a different slot.',
+                '/data/attributes/order_time'
+            );
         }
     }
 }

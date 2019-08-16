@@ -18,6 +18,7 @@ class Order extends Model
     protected $casts = [
         'order_time'  => 'datetime:Y-m-d\TH:i:s',
         'is_takeaway' => 'boolean',
+        'is_delayed'  => 'boolean',
     ];
 
     /**
@@ -44,9 +45,17 @@ class Order extends Model
     /**
      * @return string
      */
-    public function getTotalAmountFormattedAttribute()
+    public function getTotalAmountFormattedAttribute(): string
     {
         return money_format('%.0n', $this->total_amount / 100);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderTimeShortAttribute(): string
+    {
+        return (new Carbon($this->order_time))->format('H:i');
     }
 
     /**

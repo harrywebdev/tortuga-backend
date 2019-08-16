@@ -46,7 +46,8 @@ return [
     'hooks' => [
         // Right before we start deploying.
         'start'   => [
-            //
+            // pause Horizon to prevent caching issue
+            'artisan:horizon:pause',
         ],
 
         // Code and composer vendors are ready but nothing is built.
@@ -61,6 +62,9 @@ return [
             'artisan:cache:clear',
             'artisan:config:cache',
             'artisan:migrate',
+
+            // restart Horizon via supervisor
+            'artisan:horizon:terminate',
         ],
 
         // Deployment is done and live

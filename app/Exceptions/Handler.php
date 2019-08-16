@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -63,6 +64,15 @@ class Handler extends ExceptionHandler
                 'title'  => 'Internal Server Error',
                 'detail' => $exception->getMessage(),
             ],]], $status);
+        }
+
+        if ($request->isMethod('post') && $exception instanceof MethodNotAllowedHttpException) {
+            return response()->json((object)['errors' => [(object)[
+                'status' => 404,
+                'source' => (object)['pointer' => '/'],
+                'title'  => 'Not Found',
+                'detail' => 'Not Found',
+            ],]], 404);
         }
 
         return parent::render($request, $exception);

@@ -12,7 +12,7 @@ use Tortuga\SlotStrategy;
 use Tortuga\Validation\JsonSchemaValidator;
 use Tortuga\Validation\OrderSlotFullyBookedException;
 
-class OrderCreationStrategy
+class CreateOrderStrategy
 {
     /**
      * @var JsonSchemaValidator
@@ -96,11 +96,7 @@ class OrderCreationStrategy
         $order->status          = OrderStatus::RECEIVED();
         $order->save();
 
-        try {
-            event(new OrderReceived($order));
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-        }
+        event(new OrderReceived($order));
 
         return $order;
     }

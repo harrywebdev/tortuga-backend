@@ -67,10 +67,11 @@ class SlotStrategy
     }
 
     /**
+     * @param bool $allDaySlots
      * @return TimeslotCollection
      * @throws \Exception
      */
-    private function _getOpeningHoursSlots(): TimeslotCollection
+    private function _getOpeningHoursSlots($allDaySlots = false): TimeslotCollection
     {
         if (!$this->settings->get(SettingsName::IS_OPEN_FOR_BOOKING())) {
             throw new \Exception('Shop is closed - no slots.');
@@ -103,7 +104,7 @@ class SlotStrategy
         }
 
         // testing stuff
-        if (config('app.env') === 'local') {
+        if (config('tortuga.debug_slots')) {
             $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
         }
 
@@ -123,18 +124,20 @@ class SlotStrategy
             return $acc;
         }, []);
 
-        // filter old slots
-        // addMinutes: 30 minutes buffer from now to available order time
-        // ceilMinute: 30 minutes rounding for nearest slot
-        /** @var Carbon $nearestSlotTime */
-        $nearestSlotTime = Carbon::now()->addMinutes(30)->ceilMinute(30);
+        if (!$allDaySlots) {
+            // filter old slots
+            // addMinutes: 30 minutes buffer from now to available order time
+            // ceilMinute: 30 minutes rounding for nearest slot
+            /** @var Carbon $nearestSlotTime */
+            $nearestSlotTime = Carbon::now()->addMinutes(30)->ceilMinute(30);
 
-        $hourSlots = array_filter($hourSlots, function (Timeslot $timeslot) use ($nearestSlotTime) {
-            return $nearestSlotTime->diffInSeconds($timeslot->start(), false) >= 0;
-        });
+            $hourSlots = array_filter($hourSlots, function (Timeslot $timeslot) use ($nearestSlotTime) {
+                return $nearestSlotTime->diffInSeconds($timeslot->start(), false) >= 0;
+            });
 
-        if (!count($hourSlots)) {
-            throw new \Exception('No slots found.');
+            if (!count($hourSlots)) {
+                throw new \Exception('No slots found.');
+            }
         }
 
         $slotCollection = new TimeslotCollection(array_shift($hourSlots));
@@ -177,6 +180,7 @@ class SlotStrategy
     }
 
     /**
+     * Creates Carbon TS from short `H:i` format
      * @param string $shortString HH:MM format
      * @return Carbon
      */
@@ -198,5 +202,29 @@ class SlotStrategy
         $orderTime->second = 0;
 
         return $orderTime;
+    }
+
+    /**
+     * Checks whether order can be delayed to supplied slot
+     * @param Carbon $orderTime
+     * @return bool
+     */
+    public function isOpenForDelayedOrder(Carbon $orderTime): bool
+    {
+        // check if slot exists
+        try {
+            $openingHoursSlots = $this->_getOpeningHoursSlots(true);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        // check if desired slot even exists
+        foreach ($openingHoursSlots as $openingHoursSlot) {
+            if ($openingHoursSlot->start()->equalTo($orderTime)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

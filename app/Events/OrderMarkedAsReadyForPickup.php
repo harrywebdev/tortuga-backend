@@ -4,7 +4,6 @@ namespace App\Events;
 
 use App\Order;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class OrderReceived implements ShouldBroadcast
+class OrderMarkedAsReadyForPickup
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -44,29 +43,8 @@ class OrderReceived implements ShouldBroadcast
      *
      * @return \Illuminate\Broadcasting\Channel|array
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
-        return new Channel('orders');
-    }
-
-    /**
-     * The event's broadcast name.
-     *
-     * @return string
-     */
-    public function broadcastAs(): string
-    {
-        return 'order.received';
-    }
-
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array
-     */
-    public function broadcastWith(): array
-    {
-        $order = new \App\Http\Resources\Order($this->order);
-        return $order->jsonSerialize();
+        return new PrivateChannel('channel-name');
     }
 }

@@ -38,19 +38,24 @@
               "type": "string",
               "format": "date-time"
             },
-            "reject_reason": {
-              "type": [
-                "string",
-                "null"
-              ],
-              "maxLength": 191
+            "rejected_reason": {
+              "enum": [
+                "no_time",
+                "missing_product",
+                "on_request",
+                "no_reason",
+                "is_invalid",
+                null
+              ]
             },
-            "cancel_reason": {
-              "type": [
-                "string",
-                "null"
-              ],
-              "maxLength": 191
+            "cancelled_reason": {
+              "enum": [
+                "no_show",
+                "new_order",
+                "on_request",
+                "no_reason",
+                null
+              ]
             }
           }
         },
