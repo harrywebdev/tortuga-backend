@@ -6,6 +6,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Log;
 
 class Controller extends BaseController
 {
@@ -20,11 +21,15 @@ class Controller extends BaseController
      */
     protected function _returnError($status = 404, $title = 'Not Found', $detail = 'Not Found', $pointer = '/')
     {
-        return response()->json((object)['errors' => [(object)[
+        $errorData = [
             'status' => $status,
             'source' => (object)['pointer' => $pointer],
             'title'  => $title,
             'detail' => $detail,
-        ],]], $status);
+        ];
+
+        Log::channel('sentry')->error("$status: $title", $errorData);
+
+        return response()->json((object)['errors' => [(object)$errorData]], $status);
     }
 }
