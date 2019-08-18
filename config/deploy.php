@@ -46,8 +46,7 @@ return [
     'hooks' => [
         // Right before we start deploying.
         'start'   => [
-            // pause Horizon to prevent caching issue
-            'artisan:horizon:pause',
+            //
         ],
 
         // Code and composer vendors are ready but nothing is built.
@@ -57,6 +56,10 @@ return [
 
         // Deployment is done but not live yet (before symlink)
         'ready'   => [
+            // pause Horizon to prevent caching issue
+            'artisan:horizon:pause',
+
+            // default tasks:
             'artisan:storage:link',
             'artisan:view:clear',
             'artisan:cache:clear',
@@ -145,7 +148,7 @@ return [
     */
 
     'include' => [
-        //
+        'recipes/artisan_horizon_pause.php',
     ],
 
     /*
