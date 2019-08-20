@@ -15,6 +15,14 @@ use App\Http\Resources\Customer as CustomerResource;
 class CustomerController extends Controller
 {
     /**
+     * CustomerController constructor.
+     */
+    public function __construct()
+    {
+        $this->middleware('throttle:20,1')->only('index');
+    }
+
+    /**
      * @param Request $request
      * @return CustomerCollection|\Illuminate\Http\JsonResponse
      */

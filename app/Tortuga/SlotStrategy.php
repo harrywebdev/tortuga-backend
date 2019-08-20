@@ -112,6 +112,13 @@ class SlotStrategy
         $hourSlots = array_reduce($hourSlots, function ($acc, $item) {
             $carbon = Carbon::createFromTime($item, 0, 0);
 
+            // firstly, if we are after midnight still in night hours,
+            // we need to put the hours in the correct date - starting
+            // with the earliest opening hours, that would mean yesterday
+            if (Carbon::now()->hour <= 3) {
+                $carbon = $carbon->subDay(1);
+            }
+
             // midnight - 4am hours means its tomorrow's date
             if ($item <= 4) {
                 $carbon = $carbon->addDay();

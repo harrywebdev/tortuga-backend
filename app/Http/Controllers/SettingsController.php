@@ -24,6 +24,7 @@ class SettingsController extends Controller
     public function __construct(JsonSchemaValidator $validator)
     {
         $this->validator = $validator;
+        $this->middleware('auth:api');
     }
 
     /**

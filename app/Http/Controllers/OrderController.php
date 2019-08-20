@@ -27,6 +27,7 @@ class OrderController extends Controller
     public function __construct(JsonSchemaValidator $validator)
     {
         $this->validator = $validator;
+        $this->middleware('auth:api')->only(['index', 'update']);
     }
 
     /**

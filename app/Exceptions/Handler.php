@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -53,15 +55,26 @@ class Handler extends ExceptionHandler
     {
         if ($request->wantsJson()) {
             $status = 500;
+            $title  = 'Internal Server Error';
 
             if ($this->isHttpException($exception)) {
                 $status = $exception->getStatusCode();
             }
 
+            if ($exception instanceof AuthenticationException) {
+                $status = 401;
+                $title  = $exception->getMessage();
+            }
+
+            if ($exception instanceof AuthorizationException) {
+                $status = 403;
+                $title  = $exception->getMessage();
+            }
+
             return response()->json((object)['errors' => [(object)[
                 'status' => $status,
                 'source' => (object)['pointer' => '/'],
-                'title'  => 'Internal Server Error',
+                'title'  => $title,
                 'detail' => $exception->getMessage(),
             ],]], $status);
         }
