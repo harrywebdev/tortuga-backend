@@ -27,6 +27,20 @@ class Order extends Model
     protected $guarded = ['id'];
 
     /**
+     * Generate Hash ID
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        // create Hash ID for Order when it's created
+        Order::created(function ($order) {
+            $order->hash_id = mt_rand(100000, 999999);
+            $order->save();
+        });
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function items()

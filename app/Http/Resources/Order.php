@@ -18,6 +18,7 @@ class Order extends JsonResource
             'id'         => $this->id,
             'type'       => 'orders',
             'attributes' => [
+                'hash_id'                => $this->hash_id,
                 'delivery_type'          => $this->delivery_type,
                 'payment_type'           => $this->payment_type,
                 'order_time'             => $this->order_time,
