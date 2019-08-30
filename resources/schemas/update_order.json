@@ -26,6 +26,8 @@
           "properties": {
             "status": {
               "enum": [
+                "ignored",
+                "accepted",
                 "received",
                 "processing",
                 "rejected",

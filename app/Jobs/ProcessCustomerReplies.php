@@ -76,10 +76,16 @@ class ProcessCustomerReplies implements ShouldQueue
     private function _updateOrderWithReply(string $recipient, array $replies)
     {
         // TODO: configuration of valid TextMessaging responses (locale friendly)
-        // first let's check for any valid reply like "NE"
-        // only CANCEL action is possible currently with the reply
+        // first let's check for any valid reply like "JO" or "ANO"
+        // only confirmation action is possible currently with the reply
         $validReplies = array_filter($replies, function ($reply) {
-            return isset($reply['message']) && trim(mb_strtolower($reply['message'])) === 'ne';
+            if (!isset($reply['message'])) {
+                return false;
+            }
+
+            $reply = trim(mb_strtolower($reply['message']));
+
+            return $reply === 'ano' || $reply === 'jo';
         });
 
         if (!count($validReplies)) {
@@ -98,19 +104,15 @@ class ProcessCustomerReplies implements ShouldQueue
                 ->orderedByTime()
                 ->fromNow()
                 ->where('is_delayed', 1)
-                ->whereIn('status', [
-                    OrderStatus::RECEIVED(), OrderStatus::ACCEPTED(), OrderStatus::PROCESSING(), OrderStatus::MADE(),
-                ])
+                ->where('status', '=', OrderStatus::IGNORED())
                 ->firstOrFail();
 
-            // this only happens once because next time order does not fulfill conditions above ^
-            $order->status           = OrderStatus::CANCELLED();
-            $order->cancelled_reason = OrderCancelReason::DELAYED_ORDER();
+            $order->status = OrderStatus::ACCEPTED();
             $order->save();
 
-            NotifyCustomerAboutOrderCancelled::dispatch($order);
+            NotifyCustomerAboutOrderDelayAccepted::dispatch($order);
 
-            Log::info('Customer cancelled their order via SMS.',
+            Log::info('Customer confirmed their order via SMS.',
                 ['customer_id' => $customer->id, 'order_id' => $order->id]);
         } catch (ModelNotFoundException $exception) {
             Log::warning('Processing replies: ' . $exception->getMessage(),

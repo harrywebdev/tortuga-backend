@@ -55,20 +55,6 @@ class UpdateOrderStrategy
             'http://localhost/update_order.json'
         );
 
-        // update time?
-        $isDelayed = false;
-        $orderTime = new Carbon($data->data->attributes->order_time);
-        if ($orderTime != $order->order_time) {
-            // check if desired slot is available
-            if (!$this->slotStrategy->isOpenForDelayedOrder($orderTime)) {
-                throw new OrderSlotFullyBookedException();
-            }
-
-            $order->order_time = $orderTime;
-            $order->is_delayed = true;
-            $isDelayed         = true;
-        }
-
         // update status
         $statusChanged = false;
         if ($data->data->attributes->status !== $order->status) {
@@ -86,8 +72,24 @@ class UpdateOrderStrategy
             $order->cancelled_reason = new OrderCancelReason($data->data->attributes->cancelled_reason);
         }
 
-        $order->save();
+        // update time?
+        $isDelayed = false;
+        $orderTime = new Carbon($data->data->attributes->order_time);
+        if ($orderTime != $order->order_time) {
+            // check if desired slot is available
+            if (!$this->slotStrategy->isOpenForDelayedOrder($orderTime)) {
+                throw new OrderSlotFullyBookedException();
+            }
 
+            // mark as Ignored so it's obvious Customer hasn't confirmed the change
+            $order->status     = OrderStatus::IGNORED();
+            $order->order_time = $orderTime;
+            $order->is_delayed = true;
+            $isDelayed         = true;
+        }
+
+        $order->save();
+ 
         // notifications
         if ($statusChanged && $order->status == OrderStatus::MADE()) {
             event(new OrderMarkedAsReadyForPickup($order));

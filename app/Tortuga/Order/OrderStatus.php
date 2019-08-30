@@ -68,6 +68,7 @@ class OrderStatus extends Enum
 
     /**
      * Automatically flagged when not being accepted in time
+     * Also delayed Orders without being confirmed
      * Makes the Expired container
      */
     private const IGNORED = 'ignored';

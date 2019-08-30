@@ -36,7 +36,6 @@ class CustomerCommunicator
      */
     public function sendOrderReadyNotification(Customer $customer, Order $order)
     {
-        // message should be 160 chars max
         $message = sprintf(
             "Ahoj{}! Objednávka #%s na %s je připravena k vyzvednutí! Díky, \nTortuga Bay",
             $order->hash_id,
@@ -120,7 +119,7 @@ class CustomerCommunicator
     {
         // message should be 160 chars max
         $message = sprintf(
-            "Ahoj{}! Omlouváme se, objednávka #%s bude spožděna. Nový čas vyzvednutí %s - pošli NE pro zrušení! Díky za pochopení, \nTortuga Bay",
+            "Ahoj{}! Omlouváme se, objednávka #%s bude spožděna. Nový čas vyzvednutí %s - pošli JO pro potvrzení! Díky za pochopení, \nTortuga Bay",
             $order->hash_id,
             $order->order_time_short
         );
@@ -129,6 +128,23 @@ class CustomerCommunicator
         $message = $this->messenger->sendMessage($customer->mobile_number, $message, true);
 
         Log::debug('Message sent.', ['message' => $message]);
+    }
+
+    /**
+     * When Customer accepted delayed Order
+     * @param Customer $customer
+     * @param Order    $order
+     */
+    public function sendOrderDelayAcceptedNotification(Customer $customer, Order $order)
+    {
+        $message = sprintf(
+            "Super! Objednávka #%s bude připravena k vyzvednutí na #%s! Díky{}, \nTortuga Bay",
+            $order->hash_id,
+            $order->order_time_short
+        );
+        $message = $this->_addCustomerNameToMessageIfPossible($message, $customer->name);
+
+        $this->messenger->sendMessage($customer->mobile_number, $message, false);
     }
 
     /**
