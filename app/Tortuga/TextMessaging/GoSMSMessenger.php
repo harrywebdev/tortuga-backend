@@ -47,6 +47,10 @@ class GoSMSMessenger implements Messenger
      */
     public function sendMessage(string $recipient, string $message, bool $isReplyable): object
     {
+        if (config('tortuga.debug_notifications')) {
+            Log::debug('Going to send a message', [$message, $recipient, $isReplyable]);
+        }
+
         try {
             // remove diacritics
             // TODO: locale
