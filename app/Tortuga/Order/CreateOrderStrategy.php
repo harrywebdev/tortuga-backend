@@ -6,6 +6,7 @@ use App\Events\OrderReceived;
 use App\Order;
 use App\OrderItem;
 use App\ProductVariation;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Tortuga\AppSettings;
 use Tortuga\SlotStrategy;
@@ -54,7 +55,7 @@ class CreateOrderStrategy
             'http://localhost/create_order.json'
         );
 
-        $orderTime = $this->slotStrategy->createOrderTimeFromShortString($orderData->data->attributes->order_time);
+        $orderTime = new Carbon($orderData->data->attributes->order_time);
 
         // check if desired slot is available
         if (!$this->slotStrategy->isSlotAvailable($orderTime)) {

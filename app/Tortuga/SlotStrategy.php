@@ -56,9 +56,8 @@ class SlotStrategy
                 $ordersBySlots[$slotString] < $this->settings->get(SettingsName::MAX_ORDERS_PER_SLOT())
             ) {
                 $availableSlots->add([
-                    'id'       => $slot->start()->timestamp,
-                    'datetime' => $slotString,
-                    'slot'     => $slot->start()->format('H:i'),
+                    'id'   => $slot->start()->timestamp,
+                    'slot' => $slot->start()->format('Y-m-d\TH:i:s.u\Z'),
                 ]);
             }
         }
@@ -184,31 +183,6 @@ class SlotStrategy
         }
 
         return false;
-    }
-
-    /**
-     * Creates Carbon TS from short `H:i` format
-     * @param string $shortString HH:MM format
-     * @return Carbon
-     */
-    public function createOrderTimeFromShortString($shortString): Carbon
-    {
-        $orderTime = Carbon::now();
-        list ($orderTimeHour, $orderTimeMinutes) = explode(':', $shortString);
-
-        // add day if *now* is not after midnight but the order time is
-        // (the order time slot should be with the correct date)
-        // TODO: threshold: 3am (should be the last opening hour if it's next day)
-        if ($orderTime->hour > 3 && (int)$orderTimeHour <= 3) {
-            $orderTime->addDay();
-        }
-
-        // set correct date for order time
-        $orderTime->hour   = (int)$orderTimeHour;
-        $orderTime->minute = (int)$orderTimeMinutes;
-        $orderTime->second = 0;
-
-        return $orderTime;
     }
 
     /**

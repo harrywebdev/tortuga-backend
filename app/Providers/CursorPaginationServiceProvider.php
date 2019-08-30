@@ -36,12 +36,10 @@ class CursorPaginationServiceProvider extends ServiceProvider
                         $direction = array_shift($columns);
                         $value     = array_shift($cursor);
 
-                        // see if it's a date, then instantiate as Carbon and set correct timestamp
-                        // because it comes in UTC from the serialization process
+                        // TODO: see if can  remove this conversaion to Carbon altogether with (all is in UTC now)
                         try {
-                            $dateValue = Carbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value, 'UTC');
+                            $dateValue = Carbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value);
                             $value     = $dateValue;
-                            $value->setTimezone(config('app.timezone'));
                         } catch (\Exception $e) {
                             //
                         }

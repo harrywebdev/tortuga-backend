@@ -18,8 +18,7 @@ class Slot extends JsonResource
             'id'         => $this->resource['id'],
             'type'       => 'slots',
             'attributes' => [
-                'datetime' => $this->resource['datetime'],
-                'slot'     => $this->resource['slot'],
+                'slot' => $this->resource['slot'],
             ],
         ];
     }
