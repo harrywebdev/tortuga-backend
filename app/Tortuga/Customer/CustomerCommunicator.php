@@ -33,9 +33,9 @@ class CustomerCommunicator
     {
         // message should be 160 chars max
         $message = sprintf(
-            "Ahoj%s! Objednávka za %s na %s je připravena k vyzvednutí! Díky, \nTortuga Bay",
+            "Ahoj%s! Objednávka #%s na %s je připravena k vyzvednutí! Díky, \nTortuga Bay",
             strlen($customer->name) <= 20 ? ' ' . $customer->name : '',
-            $order->total_amount_formatted,
+            $order->hash_id,
             $order->order_time_short
         );
 
@@ -51,22 +51,22 @@ class CustomerCommunicator
         switch ($order->rejected_reason) {
             case OrderRejectReason::NO_TIME():
                 $message =
-                    "Ahoj%s! Objednávku na %s musíme bohužel zrušit, nestíháme :( Díky za pochopení! \nTortuga Bay";
+                    "Ahoj%s! Objednávku #%s musíme bohužel zrušit, nestíháme :( Díky za pochopení! \nTortuga Bay";
                 break;
 
             case OrderRejectReason::MISSING_PRODUCT():
                 $message =
-                    "Ahoj%s! Objednávku na %s musíme bohužel zrušit, nemáme požadované jídlo :( Díky za pochopení! \nTortuga Bay";
+                    "Ahoj%s! Objednávku #%s musíme bohužel zrušit, nemáme požadované jídlo :( Díky za pochopení! \nTortuga Bay";
                 break;
 
             case OrderRejectReason::ON_REQUEST():
-                $message = "Ahoj%s! Objednávka na %s je zrušena podle přání. Tak třeba příště! \nTortuga Bay";
+                $message = "Ahoj%s! Objednávka #%s je zrušena podle přání. Tak třeba příště! \nTortuga Bay";
                 break;
 
             case OrderRejectReason::NO_REASON():
             case OrderRejectReason::IS_INVALID():
             default:
-                $message = "Ahoj%s! Objednávka za %s je bohužel zrušena. Tak třeba příště! \nTortuga Bay";
+                $message = "Ahoj%s! Objednávka #%s je bohužel zrušena. Tak třeba příště! \nTortuga Bay";
                 break;
         }
 
@@ -74,7 +74,7 @@ class CustomerCommunicator
         $message = sprintf(
             $message,
             strlen($customer->name) <= 20 ? ' ' . $customer->name : '',
-            $order->order_time_short
+            $order->hash_id
         );
 
         $message = $this->messenger->sendMessage($customer->mobile_number, $message, false);
@@ -90,7 +90,7 @@ class CustomerCommunicator
     {
         switch ($order->cancelled_reason) {
             case OrderCancelReason::DELAYED_ORDER():
-                $message = "Ahoj%s! Objednávka za %s na %s je zrušena podle přání. Tak třeba příště! \nTortuga Bay";
+                $message = "Ahoj%s! Objednávka #%s na %s je zrušena podle přání. Tak třeba příště! \nTortuga Bay";
                 break;
             default:
                 Log::info("No notification for Order with reason: " . $order->cancelled_reason);
@@ -101,7 +101,7 @@ class CustomerCommunicator
         $message = sprintf(
             $message,
             strlen($customer->name) <= 20 ? ' ' . $customer->name : '',
-            $order->total_amount_formatted,
+            $order->hash_id,
             $order->order_time_short
         );
 
@@ -118,9 +118,9 @@ class CustomerCommunicator
     {
         // message should be 160 chars max
         $message = sprintf(
-            "Ahoj%s! Omlouváme se, objednávka za %s bude spožděna. Nový čas vyzvednutí %s - pošli NE pro zrušení! Díky za pochopení, \nTortuga Bay",
+            "Ahoj%s! Omlouváme se, objednávka #%s bude spožděna. Nový čas vyzvednutí %s - pošli NE pro zrušení! Díky za pochopení, \nTortuga Bay",
             strlen($customer->name) <= 10 ? ' ' . $customer->name : '',
-            $order->total_amount_formatted,
+            $order->hash_id,
             $order->order_time_short
         );
 
