@@ -26,12 +26,16 @@ class GoSMSMessenger implements Messenger
      */
     public function __construct(string $clientId, string $clientSecret, array $channels)
     {
-        $this->client = new \SMS\GoSMS($clientId, $clientSecret);
-        $this->client->authenticate();
+        try {
+            $this->client = new \SMS\GoSMS($clientId, $clientSecret);
+            $this->client->authenticate();
 
-        $this->channels = array_map(function ($channelId) {
-            return (int)$channelId;
-        }, $channels);
+            $this->channels = array_map(function ($channelId) {
+                return (int)$channelId;
+            }, $channels);
+        } catch (\Exception $exception) {
+            Log::error('Failed to establish GoSMS connection: ' . $exception->getMessage());
+        }
     }
 
 
@@ -61,7 +65,6 @@ class GoSMSMessenger implements Messenger
             Log::error('Failed to send text message: ' . $exception->getMessage(), [
                 'recipient' => $recipient,
                 'message'   => $message,
-                'stack'     => $exception->getTrace(),
             ]);
         }
 
