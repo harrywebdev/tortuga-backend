@@ -7,6 +7,7 @@ use MyCLabs\Enum\Enum;
 /**
  * @method static IS_OPEN_FOR_BOOKING()
  * @method static MAX_ORDERS_PER_SLOT()
+ * @method static OPENING_HOURS()
  */
 class SettingsName extends Enum
 {
@@ -19,4 +20,9 @@ class SettingsName extends Enum
      * Determines how many Orders can be booked in 1 slot.
      */
     private const MAX_ORDERS_PER_SLOT = 'max_orders_per_slot';
+
+    /**
+     * Determines how many Orders can be booked in 1 slot.
+     */
+    private const OPENING_HOURS = 'opening_hours';
 }

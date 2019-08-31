@@ -6,6 +6,7 @@ use App\Order;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Timeslot\Timeslot;
 use Timeslot\TimeslotCollection;
 use Tortuga\Order\OrderStatus;
@@ -77,34 +78,20 @@ class SlotStrategy
         }
 
         // midnight - 3am still counts as previous day
-        $dayOfWeek = (Carbon::now()->hour <= 3 ? Carbon::yesterday() : Carbon::now())->dayOfWeekIso;
-        $hourSlots = [];
+        $dayOfWeek = strtolower((Carbon::now()->hour <= 3 ? Carbon::yesterday() : Carbon::now())->englishDayOfWeek);
 
-        // FIX: hardcoded opening hours
-        switch ($dayOfWeek) {
-            // Su, Mo closed
-            case 7:
-            case 1:
-                break;
-            // Tu, We, Th
-            case 2:
-            case 3:
-            case 4:
-                $hourSlots = [11, 12, 17, 18, 19, 20];
-                break;
-            // Fr
-            case 5:
-                $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
-                break;
-            // Sa
-            case 6:
-                $hourSlots = [18, 19, 20, 21, 22, 23];
-                break;
+        $openingHours = $this->settings->get(SettingsName::OPENING_HOURS());
+        if (!isset($openingHours[$dayOfWeek])) {
+            Log::error('Invalid configuration of opening hours.',
+                ['dayOfWeek' => $dayOfWeek, 'openingHours' => $openingHours]);
+            throw new \Exception('Invalid configuration of opening hours.');
         }
+
+        $hourSlots = $openingHours[$dayOfWeek];
 
         // testing stuff
         if (config('tortuga.debug_slots')) {
-            $hourSlots = [11, 12, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
+            $hourSlots = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2];
         }
 
         // build all the slots

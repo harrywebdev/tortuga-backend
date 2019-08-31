@@ -12,11 +12,21 @@ class SettingsSeeder extends Seeder
      */
     public function run()
     {
-
         $settings = [];
 
         $settings[(string)SettingsName::IS_OPEN_FOR_BOOKING()] = 1;
         $settings[(string)SettingsName::MAX_ORDERS_PER_SLOT()] = 3;
+
+        // these times are in UTC
+        $settings[(string)SettingsName::OPENING_HOURS()] = json_encode([
+            'sunday'    => [],
+            'monday'    => [],
+            'tuesday'   => [9, 10, 15, 16, 17, 18],
+            'wednesday' => [9, 10, 15, 16, 17, 18],
+            'thursday'  => [9, 10, 15, 16, 17, 18],
+            'friday'    => [9, 10, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0],
+            'saturday'  => [16, 17, 18, 19, 20, 21],
+        ]);
 
         foreach ($settings as $name => $value) {
             if (!\App\Settings::where('name', '=', $name)->count()) {

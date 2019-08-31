@@ -28,7 +28,7 @@ class AppSettings
             throw new \Exception("Settings Key $key not found.");
         }
 
-        return $this->settings[$key];
+        return json_decode($this->settings[$key], true);
     }
 
     /**
