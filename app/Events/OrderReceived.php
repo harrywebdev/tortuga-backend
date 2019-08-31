@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class OrderReceived //implements ShouldBroadcast
+class OrderReceived implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -67,6 +67,6 @@ class OrderReceived //implements ShouldBroadcast
     public function broadcastWith(): array
     {
         $order = new \App\Http\Resources\Order($this->order);
-        return $order->jsonSerialize();
+        return $order->resolve();
     }
 }

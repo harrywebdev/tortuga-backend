@@ -11,7 +11,7 @@ class OrdersSeeder extends Seeder
      */
     public function run()
     {
-        \factory(App\Order::class, 5)->create()->each(function ($order) {
+        \factory(App\Order::class, 1)->create()->each(function ($order) {
             $order->items()->saveMany(\factory(App\OrderItem::class, rand(1, 3))->make());
 
             // set totals
@@ -19,6 +19,8 @@ class OrdersSeeder extends Seeder
             $order->subtotal_amount = $total;
             $order->total_amount    = $total;
             $order->save();
+
+            event(new \App\Events\OrderReceived($order));
         });
     }
 }

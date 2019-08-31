@@ -19,7 +19,7 @@
     "lorisleiva/laravel-deployer": "^0.2.11",
     "myclabs/php-enum": "^1.7",
     "opis/json-schema": "^1.0",
-    "pusher/pusher-php-server": "~3.0",
+    "pusher/pusher-php-server": "~4.0",
     "sammyk/laravel-facebook-sdk": "^3.5",
     "sentry/sentry-laravel": "1.1.0",
     "tayokin/laravel-facebook-accountkit": "^1.0",
