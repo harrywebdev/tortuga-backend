@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\OrderCollection;
 use App\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -11,6 +12,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Tortuga\CursorPaginator;
 
 class OrderReceived implements ShouldBroadcast
 {
@@ -60,13 +62,25 @@ class OrderReceived implements ShouldBroadcast
     }
 
     /**
-     * Get the data to broadcast.
+     * Get the data to broadcast. Need to append actual pagination links
+     * so the client can have working reliable record.
      *
      * @return array
      */
     public function broadcastWith(): array
     {
-        $order = new \App\Http\Resources\Order($this->order);
-        return $order->resolve();
+        // create query that starts and finishes with our only record
+        // and attach the pagination links there
+
+        $builder = Order::with(['items', 'customer'])->where('id', '=', $this->order->id);
+
+        /** @var CursorPaginator $orders */
+        $orders = $builder->cursorPaginate(1, [
+            'order_time' => 'asc',
+            'id'         => 'asc',
+        ])->appends(['limit' => 5]);
+
+        $collection = new OrderCollection($orders->items(), $orders);
+        return $collection->resolve();
     }
 }
