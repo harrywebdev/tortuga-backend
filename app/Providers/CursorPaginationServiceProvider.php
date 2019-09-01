@@ -36,7 +36,7 @@ class CursorPaginationServiceProvider extends ServiceProvider
                         $direction = array_shift($columns);
                         $value     = array_shift($cursor);
 
-                        // TODO: see if can  remove this conversaion to Carbon altogether with (all is in UTC now)
+                        // TODO: see if can  remove this conversion to Carbon altogether with (all is in UTC)
                         try {
                             $dateValue = Carbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value);
                             $value     = $dateValue;
@@ -62,33 +62,49 @@ class CursorPaginationServiceProvider extends ServiceProvider
 
             $items = $this->limit($limit + 1)->get();
 
+            // determine whether we reached the end of the items
+            $isThereNoMoreToLoad = $items->count() <= $limit;
+
+            // get rid of the extra item
+            if (!$isThereNoMoreToLoad) {
+                $items->pop();
+            }
+
+            // default is AFTER (with no cursor set)
+            $requestDirection = CursorPaginator::isCursorBefore() ? 'before' : 'after';
+
             // determine previous and next cursors
             // 1) if the request is BEFORE (looking into the past with "DESC" direction
             //      then first record (the newest, e.g. 17:00) is "next" cursor,
             //      and last record (the oldest, e.g. 14:30) is "prev" cursor
-            // 2) if the requst is AFTER (looking into the future with "ASC" direction)
+            // 2) if the request is AFTER (looking into the future with "ASC" direction)
             //      then it's the other way around
-            // default is AFTER (with no cursor set)
 
-            // prevCursor
             $prevCursor = null;
+            $nextCursor = null;
             if ($items->count()) {
-                $prevCursor = array_map(function ($column) use ($items) {
-                    return CursorPaginator::isCursorBefore() ? $items->last()->{$column} : $items->first()->{$column};
+                // prevCursor
+                $prevCursor = array_map(function ($column) use ($items, $requestDirection) {
+                    return $requestDirection === 'before' ? $items->last()->{$column} : $items->first()->{$column};
+                }, array_keys($columns));
+
+                // nextCursor
+                $nextCursor = array_map(function ($column) use ($items, $requestDirection) {
+                    return $requestDirection === 'before' ? $items->first()->{$column} : $items->last()->{$column};
                 }, array_keys($columns));
             }
 
-            // no need for next cursor
-            if ($items->count() <= $limit) {
-                return new CursorPaginator($items, null, $prevCursor);
+            // if there is no more to load:
+            // 1) if the request is BEFORE, then "prev" cursor is null (no more in the past)
+            // 2) if the request is AFTER, then "next" cursor is null (no more in the future)
+            // default is AFTER
+            if ($isThereNoMoreToLoad) {
+                return new CursorPaginator(
+                    $items,
+                    $requestDirection === 'after' ? null : $nextCursor,
+                    $requestDirection === 'before' ? null : $prevCursor
+                );
             }
-
-            $items->pop();
-
-            // nextCursor
-            $nextCursor = array_map(function ($column) use ($items) {
-                return CursorPaginator::isCursorBefore() ? $items->first()->{$column} : $items->last()->{$column};
-            }, array_keys($columns));
 
             return new CursorPaginator($items, $nextCursor, $prevCursor);
         });
