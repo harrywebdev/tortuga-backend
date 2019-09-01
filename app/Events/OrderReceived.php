@@ -48,7 +48,7 @@ class OrderReceived implements ShouldBroadcast
      */
     public function broadcastOn(): Channel
     {
-        return new Channel('orders');
+        return new PrivateChannel('orders');
     }
 
     /**
