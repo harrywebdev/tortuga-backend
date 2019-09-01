@@ -4,6 +4,8 @@ namespace Tortuga;
 
 class AppSettings
 {
+    const CACHE_KEY = 'settings';
+
     /**
      * @var array
      */

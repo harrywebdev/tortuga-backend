@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Order;
 use App\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Tortuga\AppSettings;
 use Tortuga\SettingsName;
 use Tortuga\Validation\InvalidDataException;
 use Tortuga\Validation\JsonSchemaValidator;
@@ -57,6 +59,9 @@ class SettingsController extends Controller
                 'http://localhost/update_settings.json'
             );
 
+            // any request here invalidates cache instantly
+            Cache::forget(AppSettings::CACHE_KEY);
+
             // currently, only `is_open_for_booking` is available to be changed by this request
             $key = SettingsName::IS_OPEN_FOR_BOOKING();
 
@@ -67,8 +72,8 @@ class SettingsController extends Controller
                 $settings->save();
             }
 
-            /** @var \Tortuga\AppSettings $settings */
-            $settings = app()->make(\Tortuga\AppSettings::class);
+            /** @var AppSettings $settings */
+            $settings = app()->make(AppSettings::class);
             $settings = $settings->all();
 
             // HACK: add this for our resource

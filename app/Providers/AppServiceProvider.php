@@ -43,12 +43,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(AppSettings::class, function () {
-            if (Cache::has('settings')) {
+            if (Cache::has(AppSettings::CACHE_KEY)) {
                 return new AppSettings(Cache::get('settings'));
             }
 
             // cache settings for a day
-            $settings = Cache::remember('settings', 60 * 60 * 24, function () {
+            $settings = Cache::remember(AppSettings::CACHE_KEY, 60 * 60 * 24, function () {
                 return Settings::all()->pluck('value', 'name')->toArray();
             });
 
