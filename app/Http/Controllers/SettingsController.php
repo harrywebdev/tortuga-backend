@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\KitchenClosed;
+use App\Events\KitchenOpened;
 use App\Order;
 use App\Settings;
 use Illuminate\Http\Request;
@@ -70,6 +72,8 @@ class SettingsController extends Controller
             if ($data->data->attributes->{$key} !== (bool)$settings->value) {
                 $settings->value = $data->data->attributes->{$key};
                 $settings->save();
+
+                event($settings->value ? new KitchenOpened() : new KitchenClosed());
             }
 
             /** @var AppSettings $settings */
