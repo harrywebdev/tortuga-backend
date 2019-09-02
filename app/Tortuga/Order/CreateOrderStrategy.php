@@ -97,7 +97,11 @@ class CreateOrderStrategy
         $order->status          = OrderStatus::RECEIVED();
         $order->save();
 
-        event(new OrderReceived($order));
+        try {
+            event(new OrderReceived($order));
+        } catch (\Exception $e) {
+            Log::error("Could not emit event: OrderReceived");
+        }
 
         return $order;
     }

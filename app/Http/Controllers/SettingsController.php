@@ -8,6 +8,7 @@ use App\Order;
 use App\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Tortuga\AppSettings;
 use Tortuga\SettingsName;
 use Tortuga\Validation\InvalidDataException;
@@ -73,7 +74,11 @@ class SettingsController extends Controller
                 $settings->value = $data->data->attributes->{$key};
                 $settings->save();
 
-                event($settings->value ? new KitchenOpened() : new KitchenClosed());
+                try {
+                    event($settings->value ? new KitchenOpened() : new KitchenClosed());
+                } catch (\Exception $e) {
+                    Log::error("Could not emit event: " . ($settings->value ? "KitchenOpened" : "KitchenClosed"));
+                }
             }
 
             /** @var AppSettings $settings */
