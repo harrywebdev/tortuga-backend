@@ -99,4 +99,20 @@ class Handler extends ExceptionHandler
     {
         return $this->renderExceptionWithSymfony($e, config('app.debug'));
     }
+
+    /**
+     * @param Exception $e
+     * @return bool
+     */
+    public function shouldReport(Exception $e)
+    {
+        // ignore exception caught by Sentry but gracefully recovered from by Laravel
+        // https://github.com/laravel/framework/issues/28920
+        // https://github.com/getsentry/sentry-laravel/issues/254
+        if (strpos($e->getMessage(), 'STMT_PREPARE packet') !== false) {
+            return false;
+        }
+
+        return parent::shouldReport($e);
+    }
 }
