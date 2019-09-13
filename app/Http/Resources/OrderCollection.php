@@ -47,17 +47,14 @@ class OrderCollection extends ResourceCollection
         // add included data
         // * Customer (always)
         // * Order Items (if requested)
-        $data['included']  = Collection::make([]);
-        $includeOrderItems = $request->get('include') && strpos($request->get('include'), 'order-items') >= 0;
+        $data['included'] = Collection::make([]);
 
         foreach ($this->collection as $order) {
             // add customer
             $data['included']->add(Customer::make($order->customer));
 
-            if ($includeOrderItems) {
-                foreach ($order->items as $item) {
-                    $data['included']->add(OrderItem::make($item));
-                }
+            foreach ($order->items as $item) {
+                $data['included']->add(OrderItem::make($item));
             }
         }
 

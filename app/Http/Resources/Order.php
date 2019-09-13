@@ -44,27 +44,20 @@ class Order extends JsonResource
         // * Customer (always)
         // * Order Items (if requested)
         $data['relationships'] = [
-            'customer' => [
+            'customer'    => [
                 'data' => [
                     'id'   => $this->customer_id,
                     'type' => 'customers',
                 ],
             ],
+            'order-items' => ['data' => []],
         ];
 
-        $includeOrderItems = $request->get('include') && strpos($request->get('include'), 'order-items') >= 0;
-
-        if ($includeOrderItems) {
-            $data['relationships']['order-items'] = [
-                'data' => [],
+        foreach ($this->items as $item) {
+            $data['relationships']['order-items']['data'][] = [
+                'id'   => $item->id,
+                'type' => 'order-items',
             ];
-
-            foreach ($this->items as $item) {
-                $data['relationships']['order-items']['data'][] = [
-                    'id'   => $item->id,
-                    'type' => 'order-items',
-                ];
-            }
         }
 
         return $data;

@@ -81,6 +81,7 @@ class OrderReceived implements ShouldBroadcast
         ])->appends(['limit' => 5]);
 
         $collection = new OrderCollection($orders->items(), $orders);
+
         return $collection->resolve();
     }
 }
