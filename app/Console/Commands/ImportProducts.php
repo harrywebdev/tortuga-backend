@@ -49,7 +49,7 @@ class ImportProducts extends Command
             return;
         }
 
-        // first, possibly delete everything
+        // first, possibly soft delete everything
         if ($this->option('clean')) {
             ProductVariation::whereNotNull('id')->delete();
             Product::whereNotNull('id')->delete();
@@ -86,7 +86,7 @@ class ImportProducts extends Command
                     $productVariationSequence += 100;
                     $productVariationRecord   = ProductVariation::create([
                         'product_id'  => $productRecord->id,
-                        'active'      => 1,
+                        'active'      => isset($variation['active']) ? $variation['active'] : 1,
                         'sequence'    => $productVariationSequence,
                         'title'       => $variation['title'],
                         'slug'        => Str::slug($variation['title']),

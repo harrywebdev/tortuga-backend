@@ -26,8 +26,16 @@ Route::get('/categories', function (Request $request) {
 });
 
 Route::get('/products', function (Request $request) {
-    $products = Product::with('variations')->ordered()->get();
-
+    // only variations that are active
+    $products = Product::with(['variations' => function ($query) {
+        $query->where('active', '=', 1);
+    }])
+        ->ordered()
+        // only products with at least 1 active variation
+        ->whereHas('variations', function (Illuminate\Database\Eloquent\Builder $query) {
+            $query->where('active', '=', 1);
+        })->get();
+    
     return new \App\Http\Resources\ProductCollection($products);
 });
 

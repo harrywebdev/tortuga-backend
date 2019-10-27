@@ -14,6 +14,7 @@ php artisan deploy
 php artisan migrate:refresh
 php artisan db:seed
 php artisan tortuga:import:products
+php artisan tortuga:setup {client_name}
 ```
 
 Eventually can also create fake customers and orders
